@@ -1,0 +1,98 @@
+.main {
+  margin-top: 60px;
+
+  .container {
+    .main_title {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+    .main_action {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      input {
+        width: 200px;
+        padding: 7px 10px;
+        border-radius: 5px;
+        border: 1px solid #dddddd;
+        outline: none;
+      }
+      .reset-btn {
+        padding: 7px 10px;
+        border-radius: 5px;
+        border: transparent;
+        cursor: pointer;
+        width: 200px;
+        &:hover {
+          background-color: #e7e7e7;
+        }
+      }
+    }
+
+    .main_table {
+      display: flex;
+      flex-direction: column;
+
+      .main_table_title {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 100px 1fr 1fr 100px;
+        gap: 10px;
+        padding: 0 10px;
+        background-color: #e7e7e7;
+
+        .main_table_title_item {
+          box-sizing: border-box;
+          padding: 10px;
+          border-right: 1px solid #ccc;
+          &:hover {
+            background-color: #e0e0e0;
+            cursor: pointer;
+          }
+        }
+
+        .main_table_title_item:last-child {
+          border-right: none;
+        }
+
+      }
+
+      .main_row {
+        display: grid;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 5px;
+        padding: 5px 10px;
+        grid-template-columns: 100px 1fr 1fr 100px;
+        gap: 10px;
+
+        .main_row_item {
+          box-sizing: border-box;
+          padding: 10px;
+          border-right: 1px solid #ccc;
+        }
+
+        .main_row_item:nth-child(3) {
+          color: #0155aa;
+        }
+
+        .main_row_item:last-child {
+          border-right: none;
+          text-align: center;
+        }
+
+        &:hover {
+          border: 2px solid #acabab;
+          margin-bottom: 3px;
+          cursor: pointer;
+        }
+      }
+
+      .main_row:nth-child(odd) {
+        background-color: #e7e7e7;
+      }
+    }
+  }
+}

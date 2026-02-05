@@ -1,0 +1,67 @@
+<section class="User">
+  <div class="container">
+    <div class="User__grid" [formGroup]="cardForm">
+      <div class="User_img">
+        <img src="{{user.avatar }}" alt="User image" class="User_img_image">
+        <div class="User__active">Status: {{ user.active ? 'Active' : 'Not active' }}</div>
+      </div>
+      <div class="User__id">
+        <div>ID: {{ user.id }}</div>
+        <div>Url: {{ user.url }}</div>
+      </div>
+      <div class="User__firstName">
+        <label for="firstName">Имя:</label>
+        <input type="text" id="firstName" class="input"
+               [ngStyle]="{'border-color': firstName?.invalid && (firstName?.dirty || firstName?.touched) ? 'red' : ''}"
+               formControlName="firstName" name="">
+      </div>
+      <div class="User__lastName">
+        <label for="lastName">Фамилия:</label>
+        <input type="text" id="lastName" class="input"
+               [ngStyle]="{'border-color': lastName?.invalid && (lastName?.dirty || firstName?.touched) ? 'red' : ''}"
+               formControlName="lastName" name="">
+      </div>
+      <div class="User__age_experience">
+        <div class="User__age">
+          <label for="age">Возраст:</label>
+          <input type="text" id="age" class="input"
+                 [ngStyle]="{'border-color': age?.invalid && (age?.dirty || age?.touched) ? 'red' : ''}"
+                 formControlName="age" name="">
+        </div>
+        <div class="User__experience">
+          <label for="experience">Опыт:</label>
+          <input type="text" id="experience" class="input"
+                 [ngStyle]="{'border-color': experience?.invalid && (experience?.dirty || experience?.touched) ? 'red' : ''}"
+                 formControlName="experience" name="">
+        </div>
+      </div>
+      <div class="User__address">
+        <label for="address">Адрес:</label>
+        <input type="text" id="address" class="input"
+               [ngStyle]="{'border-color': address?.invalid && (address?.dirty || address?.touched) ? 'red' : ''}"
+               formControlName="address" name="">
+      </div>
+      <div class="User__phone">
+        <label for="phone">Телефон:</label>
+        <input type="text" id="phone" class="input"
+               [ngStyle]="{'border-color': phone?.invalid && (phone?.dirty || phone?.touched) ? 'red' : ''}"
+               formControlName="phone" name="">
+      </div>
+      <div class="User__email">
+        <label for="email">Email:</label>
+        <input type="text" id="email" class="input"
+               [ngStyle]="{'border-color': email?.invalid && (email?.dirty || email?.touched) ? 'red' : ''}"
+               formControlName="email" name="">
+      </div>
+      <div class="User__note">
+        <div>Заметка</div>
+        <textarea name="" id="" cols="40" rows="20" class="textArea"></textarea>
+      </div>
+      <!--      <div class="User__email">Email: <p>{{ user.address }}</p></div>-->
+      <div class="User__createDate">Создан: {{ user.createdAt }}</div>
+    </div>
+    <div class="user__action">
+      <button type="button" routerLink="/">Back</button>
+    </div>
+  </div>
+</section>

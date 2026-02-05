@@ -1,0 +1,114 @@
+.User {
+  margin-top: 60px;
+
+  .container {
+    .User__grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
+      border: 1px solid black;
+      border-radius: 15px;
+      padding: 10px;
+
+      .User_img {
+        grid-row: 1 / 5;
+        grid-column: 1 / 2;
+        justify-self: left;
+        align-self: start;
+        .User_img_image {
+          height: 200px;
+          border-radius: 15px;
+        }
+      }
+
+      .User__id {
+        grid-row: 5 / 6;
+        grid-column: 1 / 2;
+        margin-top: 10px;
+      }
+      .User__firstName {
+        grid-row: 1 / 2;
+        grid-column: 2 / 3;
+      }
+      .User__lastName {
+        grid-row: 2 / 3;
+        grid-column: 2 / 3;
+      }
+      .User__age_experience {
+        grid-row: 3 / 4;
+        grid-column: 2 / 3;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        .User__age,
+        .User__experience {
+          input {
+            width: 80px;
+          }
+        }
+      }
+      .User__address {
+        grid-row: 4 / 5;
+        grid-column: 2 / 3;
+      }
+      .User__phone {
+        grid-row: 5 / 6;
+        grid-column: 2 / 3;
+      }
+      .User__email {
+        grid-row: 6 / 7;
+        grid-column: 2 / 3;
+      }
+
+
+      .User__createDate {
+        grid-row: 6 / 7;
+        grid-column: 1 / 2;
+      }
+      .User__note {
+        grid-row: 1 / 7;
+        grid-column: 3 / 4;
+        padding-right: 10px;
+        .textArea {
+          border-radius: 7px;
+          padding: 3px 6px;
+          outline: none;
+        }
+      }
+
+      .User__active {
+        grid-row: 3 / 4;
+        grid-column: 1 / 2;
+        justify-self: left;
+        margin-top: 10px;
+      }
+    }
+    .User__grid label {
+      display: block;
+    }
+    .User__grid .input {
+      width: 400px;
+      padding: 5px 20px;
+      outline: none;
+      border-radius: 5px;
+      border: 1px solid #dddddd;
+      font-size: 17px;
+      margin-bottom: 10px;
+    }
+
+    .user__action {
+      margin-top: 10px;
+      button {
+        padding: 10px;
+        width: 100px;
+        font-size: 20px;
+        border-radius: 5px;
+        border: transparent;
+        cursor: pointer;
+        &:hover {
+          background-color: #e7e7e7;
+        }
+      }
+    }
+  }
+}
