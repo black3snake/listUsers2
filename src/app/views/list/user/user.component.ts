@@ -1,15 +1,16 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
-import {UserItem} from "../../../types/users.type";
-import {UserService} from "../../shared/services/user.service";
 import {HttpErrorResponse} from "@angular/common/http";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {FormBuilder, Validators} from "@angular/forms";
+import {UserItem} from "../../../../types/users.type";
+import {UserService} from "../../../shared/services/user.service";
+import {UserCardType} from "../../../../types/user-card.type";
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
-  styleUrls: ['./user.component.scss']
+  styleUrls: ['../../../../assets/styles/sharedList.scss']
 })
 export class UserComponent implements OnInit {
 
@@ -31,6 +32,8 @@ export class UserComponent implements OnInit {
   private userService = inject(UserService);
   private _snackBar = inject(MatSnackBar);
   private fb = inject(FormBuilder);
+  private initialFormValues!: UserCardType;
+  isEditCard: boolean = false;
 
   cardForm = this.fb.group({
     firstName: [{value: '', disabled: true}, Validators.required],
@@ -75,7 +78,7 @@ export class UserComponent implements OnInit {
             next: (data: UserItem) => {
               this.user = data;
               this.loadingDataForm(this.user);
-
+              this.initialFormValues = this.cardForm.getRawValue();
 
             },
             error: (err: HttpErrorResponse) => {
@@ -104,5 +107,57 @@ export class UserComponent implements OnInit {
       });
     }
   }
+
+  editCard() {
+    this.isEditCard = !this.isEditCard;
+    if (this.isEditCard) {
+      this.cardForm.enable();
+    } else {
+      this.updateCard(this.user.id)
+      this.cardForm.disable();
+    }
+
+  }
+
+  updateCard(id: string) {
+    const changedValues = this.getChangedValues();
+    if (Object.keys(changedValues).length === 0) {
+      this._snackBar.open('Нет изменений для сохранения');
+      return;
+    }
+
+    this.userService.updateUser(id, changedValues )
+      .subscribe( {
+        next: (updateUser: Partial<UserCardType> ) => {
+          this._snackBar.open('Данные обновлены');
+          // Обновляем начальные значения
+          this.initialFormValues = { ...this.initialFormValues, ...changedValues };
+        },
+        error: (err: HttpErrorResponse) => {
+          if (err.error && err.error.message) {
+            this._snackBar.open(err.error.message);
+          } else {
+            this._snackBar.open('Не могу получить доступ к серверу');
+          }
+        }
+      })
+  }
+
+  getChangedValues(): Partial<UserCardType> {
+    const currentValues: UserCardType = this.cardForm.getRawValue();
+    const changedValues: Partial<UserCardType> = {};
+    Object.keys(currentValues).forEach(key => {
+      const typedKey = key as keyof UserCardType;
+      const currentValue = currentValues[typedKey];
+      const initialValue = this.initialFormValues[typedKey];
+
+      // Сравниваем значения (учитываем разные типы)
+      if (JSON.stringify(currentValue) !== JSON.stringify(initialValue)) {
+        changedValues[typedKey] = currentValue;
+      }
+    });
+    return changedValues;
+  }
+
 
 }

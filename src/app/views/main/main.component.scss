@@ -18,15 +18,34 @@
         border: 1px solid #dddddd;
         outline: none;
       }
-      .reset-btn {
-        padding: 7px 10px;
-        border-radius: 5px;
-        border: transparent;
-        cursor: pointer;
-        width: 200px;
-        &:hover {
-          background-color: #e7e7e7;
+
+      }
+      .main_action_right {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+        .add-user {
+          padding: 7px 10px;
+          border-radius: 5px;
+          border: transparent;
+          cursor: pointer;
+          width: 100px;
+          background-color: #1eb61e;
+          color: #fff;
+          &:hover {
+            background-color: #0d7d0d;
+          }
         }
+        .reset-btn {
+          padding: 7px 10px;
+          border-radius: 5px;
+          border: transparent;
+          cursor: pointer;
+          width: 200px;
+          &:hover {
+            background-color: #e7e7e7;
+          }
       }
     }
 

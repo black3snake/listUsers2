@@ -11,8 +11,8 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
   ],
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
+    // ReactiveFormsModule,
+    // FormsModule,
   ],
   exports: [
     SymbolLessPipe

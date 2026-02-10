@@ -4,18 +4,22 @@
     <div class="main_action">
       <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers()"
              placeholder="Search users by name..." class="search-input">
-      <button (click)="resetFilters()" class="reset-btn">
-        Reset Filters
-      </button>
+      <div class="main_action_right">
+        <button routerLink="user" class="add-user">
+          Create User
+        </button>
+        <button (click)="resetFilters()" class="reset-btn">
+          Reset Filters
+        </button>
+      </div>
     </div>
     <div class="main_table">
       <div class="main_table_title">
         <div class="main_table_title_item" (click)="sortTable('id')">id</div>
         <div class="main_table_title_item" (click)="sortTable('name')">Fullname</div>
         <div class="main_table_title_item" (click)="sortTable('email')">Address</div>
-
         <div class="main_table_title_item" (click)="filterByActive()" *ngIf="isNotFilter">All users</div>
-        <div class="main_table_title_item" (click)="filterByActive()" *ngIf="!isNotFilter">{{ isFilterActive ? 'Active' : 'Not active'}}</div>
+        <div class="main_table_title_item" (click)="filterByActive()" *ngIf="!isNotFilter">{{ isFilterActive ? 'Active' : 'Not active' }}</div>
       </div>
       <div class="main_row" *ngFor="let user of displayedUsers" (click)="chooseUser(user.url)">
         <div class="main_row_item">{{ user.id | symbolLess }}</div>

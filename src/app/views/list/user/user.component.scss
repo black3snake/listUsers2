@@ -15,6 +15,7 @@
         grid-column: 1 / 2;
         justify-self: left;
         align-self: start;
+
         .User_img_image {
           height: 200px;
           border-radius: 15px;
@@ -26,20 +27,24 @@
         grid-column: 1 / 2;
         margin-top: 10px;
       }
+
       .User__firstName {
         grid-row: 1 / 2;
         grid-column: 2 / 3;
       }
+
       .User__lastName {
         grid-row: 2 / 3;
         grid-column: 2 / 3;
       }
+
       .User__age_experience {
         grid-row: 3 / 4;
         grid-column: 2 / 3;
         display: flex;
         align-items: center;
         gap: 10px;
+
         .User__age,
         .User__experience {
           input {
@@ -47,14 +52,17 @@
           }
         }
       }
+
       .User__address {
         grid-row: 4 / 5;
         grid-column: 2 / 3;
       }
+
       .User__phone {
         grid-row: 5 / 6;
         grid-column: 2 / 3;
       }
+
       .User__email {
         grid-row: 6 / 7;
         grid-column: 2 / 3;
@@ -65,10 +73,12 @@
         grid-row: 6 / 7;
         grid-column: 1 / 2;
       }
+
       .User__note {
         grid-row: 1 / 7;
         grid-column: 3 / 4;
         padding-right: 10px;
+
         .textArea {
           border-radius: 7px;
           padding: 3px 6px;
@@ -83,21 +93,34 @@
         margin-top: 10px;
       }
     }
+
     .User__grid label {
       display: block;
     }
+
     .User__grid .input {
       width: 400px;
       padding: 5px 20px;
       outline: none;
       border-radius: 5px;
-      border: 1px solid #dddddd;
+      border: 1px solid #e3f4ff;
       font-size: 17px;
       margin-bottom: 10px;
+      background-color: #e3f4ff;
+
+      &:disabled {
+        background-color: rgba(239, 239, 239, 0.3);
+        border: 1px solid #dddddd;
+      }
     }
+
 
     .user__action {
       margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
       button {
         padding: 10px;
         width: 100px;
@@ -105,8 +128,14 @@
         border-radius: 5px;
         border: transparent;
         cursor: pointer;
+
         &:hover {
           background-color: #e7e7e7;
+        }
+
+        &:disabled {
+          background: #92c292 !important;
+          cursor: not-allowed;
         }
       }
     }

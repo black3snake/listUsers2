@@ -1,0 +1,173 @@
+<section class="User">
+  <div class="container">
+    <div class="User__grid" [formGroup]="cardNewForm">
+      <div class="User_img">
+        <img src="{{user.avatar}}" alt="User image" class="User_img_image">
+        <div>Загрузить свою фотографию</div>
+        <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
+      </div>
+      <div class="User__load_action">
+        <button class="load-btn" (click)="openFileDialog()" [disabled]="isUploading">Load</button>
+        <button class="delete-btn" (click)="deleteAvatar()" [disabled]="isUploading">Delete</button>
+      </div>
+      <div class="User__load_note">
+        <span>*</span>
+        Размер файла не более 2Мб.
+      </div>
+      <div class="User__firstName">
+        <label for="firstName">Имя:</label>
+        <input type="text" id="firstName" class="input"
+               [ngStyle]="{'border-color': firstName?.invalid && (firstName?.dirty || firstName?.touched) ? 'red' : ''}"
+               formControlName="firstName" name="">
+      </div>
+      <div class="User__lastName">
+        <label for="lastName">Фамилия:</label>
+        <input type="text" id="lastName" class="input"
+               [ngStyle]="{'border-color': lastName?.invalid && (lastName?.dirty || firstName?.touched) ? 'red' : ''}"
+               formControlName="lastName" name="">
+      </div>
+      <div class="User__age_experience">
+        <div class="User__age">
+          <label for="age">Возраст:</label>
+          <input type="text" id="age" class="input"
+                 [ngStyle]="{'border-color': age?.invalid && (age?.dirty || age?.touched) ? 'red' : ''}"
+                 formControlName="age" name="">
+        </div>
+        <div class="User__experience">
+          <label for="experience">Опыт:</label>
+          <input type="text" id="experience" class="input"
+                 [ngStyle]="{'border-color': experience?.invalid && (experience?.dirty || experience?.touched) ? 'red' : ''}"
+                 formControlName="experience" name="">
+        </div>
+      </div>
+      <div class="User__address">
+        <label for="address">Адрес:</label>
+        <input type="text" id="address" class="input"
+               [ngStyle]="{'border-color': address?.invalid && (address?.dirty || address?.touched) ? 'red' : ''}"
+               formControlName="address" name="">
+      </div>
+      <div class="User__phone">
+        <label for="phone">Телефон:</label>
+        <input type="text" id="phone" class="input"
+               [ngStyle]="{'border-color': phone?.invalid && (phone?.dirty || phone?.touched) ? 'red' : ''}"
+               formControlName="phone" name="">
+      </div>
+      <div class="User__email">
+        <label for="email">Email:</label>
+        <input type="text" id="email" class="input"
+               [ngStyle]="{'border-color': email?.invalid && (email?.dirty || email?.touched) ? 'red' : ''}"
+               formControlName="email" name="">
+      </div>
+      <div class="User__note">
+        <div>Заметка</div>
+        <textarea name="" id="" cols="40" rows="20" class="textArea"></textarea>
+      </div>
+    </div>
+    <div class="user__action">
+      <button type="button" routerLink="/">Back</button>
+      <button type="button" (click)="saveCard()" [ngStyle]="{'background': 'green', 'color': 'white'}" [disabled]="cardNewForm.invalid">
+        Save
+      </button>
+    </div>
+  </div>
+</section>
+
+<div class="cropper-modal" *ngIf="showCropper">
+  <div class="cropper-modal-content">
+    <div class="cropper-header">
+      <h3>Обрезка фотографии</h3>
+
+      <div class="transform-indicator" *ngIf="currentRotation !== 0 || currentFlipH || currentFlipV">
+        <span *ngIf="currentRotation !== 0">↻ {{currentRotation}}°</span>
+        <span *ngIf="currentFlipH">↔</span>
+        <span *ngIf="currentFlipV">↕</span>
+      </div>
+
+      <div class="cropper-controls">
+        <button type="button" class="btn-icon" (click)="rotateLeft()" title="Повернуть влево">
+          ↶
+        </button>
+        <button type="button" class="btn-icon" (click)="rotateRight()" title="Повернуть вправо">
+          ↷
+        </button>
+        <button type="button" class="btn-icon" (click)="flipH()" title="Отразить по горизонтали">
+          ↔
+        </button>
+        <button type="button" class="btn-icon" (click)="flipV()" title="Отразить по вертикали">
+          ↕
+        </button>
+        <button type="button" class="btn-icon" (click)="resetTransform()" title="Сбросить трансформации">
+          ⟲
+        </button>
+        <button type="button" class="btn-icon" (click)="cancelCrop()" title="Закрыть">
+          ×
+        </button>
+      </div>
+    </div>
+
+    <div class="cropper-body">
+      <!-- В версии 8.1.1 нет свойства transform -->
+      <div class="image-transform-container"
+           [style.transform]="getPreviewTransform()"
+           [style.transform-origin]="'center center'">
+        <image-cropper
+          #imageCropper
+          [imageChangedEvent]="imageChangedEvent"
+          [maintainAspectRatio]="maintainAspectRatio"
+          [aspectRatio]="aspectRatio"
+          [resizeToWidth]="resizeToWidth"
+          [format]="cropperFormat"
+          [onlyScaleDown]="onlyScaleDown"
+          [imageQuality]="imageQuality"
+          (imageCropped)="imageCropped($event)"
+          (imageLoaded)="onImageLoaded()"
+          (loadImageFailed)="loadImageFailed()"
+          [ngStyle]="{'max-width': '600px', 'max-height': '500px'}"
+        >
+        </image-cropper>
+      </div>
+    </div>
+
+    <div class="cropper-footer">
+      <div class="aspect-ratios">
+        <button type="button"
+                class="aspect-btn"
+                [class.active]="aspectRatio === 1"
+                (click)="changeAspectRatio(1)">
+          1:1 (Квадрат)
+        </button>
+        <button type="button"
+                class="aspect-btn"
+                [class.active]="aspectRatio === 4/3"
+                (click)="changeAspectRatio(4/3)">
+          4:3
+        </button>
+        <button type="button"
+                class="aspect-btn"
+                [class.active]="aspectRatio === 16/9"
+                (click)="changeAspectRatio(16/9)">
+          16:9
+        </button>
+      </div>
+
+      <!-- Показываем текущие трансформации -->
+      <div class="transform-info" *ngIf="currentRotation !== 0 || currentFlipH || currentFlipV">
+        <small>
+          Примененные трансформации (будут применены после обрезки):
+          <span *ngIf="currentRotation !== 0">Поворот: {{currentRotation}}° </span>
+          <span *ngIf="currentFlipH">Отражение по горизонтали </span>
+          <span *ngIf="currentFlipV">Отражение по вертикали </span>
+        </small>
+      </div>
+
+      <div class="cropper-actions">
+        <button type="button" class="btn btn-outline" (click)="cancelCrop()">
+          Отмена
+        </button>
+        <button type="button" class="btn btn-success" (click)="applyCrop()">
+          Применить
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

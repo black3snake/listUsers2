@@ -3,11 +3,16 @@
     <div class="User__grid" [formGroup]="cardForm">
       <div class="User_img">
         <img src="{{user.avatar }}" alt="User image" class="User_img_image">
-        <div class="User__active">Status: {{ user.active ? 'Active' : 'Not active' }}</div>
+        <div class="User__active" *ngIf="!isEditCard">Status: {{ user.active ? 'Active' : 'Not active' }}</div>
+        <div class="User_img_text" *ngIf="isEditCard">загрузить своё фото</div>
       </div>
-      <div class="User__id">
+      <div class="User__id" *ngIf="!isEditCard">
         <div>ID: {{ user.id }}</div>
         <div>Url: {{ user.url }}</div>
+      </div>
+      <div class="User__load_action" *ngIf="isEditCard">
+        <button class="load-btn">Load</button>
+        <button class="delete-btn">Delete</button>
       </div>
       <div class="User__firstName">
         <label for="firstName">Имя:</label>
@@ -62,6 +67,9 @@
     </div>
     <div class="user__action">
       <button type="button" routerLink="/">Back</button>
+      <button type="button" (click)="editCard()" [ngStyle]="{'background': isEditCard ? 'green': '', 'color': isEditCard ? 'white': '' }" [disabled]="cardForm.invalid">
+        {{ !isEditCard ? 'Edit' : 'Save'}}
+      </button>
     </div>
   </div>
 </section>

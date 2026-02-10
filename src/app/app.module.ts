@@ -6,7 +6,6 @@ import { AppComponent } from './app.component';
 import { HeaderComponent } from './shared/layout/header/header.component';
 import { LayoutComponent } from './shared/layout/layout.component';
 import { MainComponent } from './views/main/main.component';
-import { UserComponent } from './views/user/user.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -19,7 +18,6 @@ import {SharedModule} from "./shared/shared.module";
     HeaderComponent,
     LayoutComponent,
     MainComponent,
-    UserComponent,
   ],
   imports: [
     HttpClientModule,
