@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
 import {HttpErrorResponse} from "@angular/common/http";
 import {MatSnackBar} from "@angular/material/snack-bar";
@@ -6,13 +6,31 @@ import {FormBuilder, Validators} from "@angular/forms";
 import {UserItem} from "../../../../types/users.type";
 import {UserService} from "../../../shared/services/user.service";
 import {UserCardType} from "../../../../types/user-card.type";
+import {CropperImageUtils} from "../../../shared/utils/cropper-image.utils"
+import {ImageCropperComponent, ImageCroppedEvent, OutputFormat} from "ngx-image-cropper";
+import {CropperImageService} from "../../../shared/services/cropper-image.service";
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
-  styleUrls: ['../../../../assets/styles/sharedList.scss']
+  styleUrls: ['../../../../assets/styles/sharedList.scss'],
+  providers: [CropperImageService]
 })
 export class UserComponent implements OnInit {
+  CropperImageUtils = CropperImageUtils;
+  @ViewChild('fileInput') fileInput!: ElementRef;
+  @ViewChild(ImageCropperComponent) imageCropper!: ImageCropperComponent;
+
+  selectedFile = CropperImageUtils.selectedFile;
+  avatarPreview = CropperImageUtils.avatarPreview;
+  croppedImage = CropperImageUtils.croppedImage;
+  originalImageBase64 = CropperImageUtils.originalImageBase64;
+  currentRotation = CropperImageUtils.currentRotation;
+  currentFlipH = CropperImageUtils.currentFlipH;
+  currentFlipV = CropperImageUtils.currentFlipV;
+  showCropper = CropperImageUtils.showCropper;
+  imageChangedEvent = CropperImageUtils.imageChangedEvent;
+  croppedFile = CropperImageUtils.croppedFile;
 
   user: UserItem = {
     id: "",
@@ -43,6 +61,7 @@ export class UserComponent implements OnInit {
     experience: [{value: '', disabled: true}, Validators.required],
     email: [{value: '', disabled: true}, Validators.required],
     phone: [{value: '', disabled: true}, Validators.required],
+    avatar: ['']
   });
 
   get firstName() {
@@ -66,8 +85,6 @@ export class UserComponent implements OnInit {
   get phone() {
     return this.cardForm.get('phone');
   }
-
-
 
   ngOnInit(): void {
     this.activatedRoute.params.subscribe(params => {
@@ -160,4 +177,115 @@ export class UserComponent implements OnInit {
   }
 
 
+  openFileDialog(): void {
+    // Вызываем click() напрямую в компоненте, где есть пользовательское действие
+    this.fileInput.nativeElement.click();
+  }
+
+  onFileSelected(event: Event): void {
+    // Передаем событие в утилиту для обработки
+    CropperImageUtils.onFileSelected(event);
+  }
+
+  deleteAvatar(): void {
+    if (confirm('Удалить текущую фотографию?')) {
+      this.selectedFile = null;
+      this.avatarPreview = 'assets/images/default-avatar.png';
+      this.cardForm.patchValue({ avatar: '' });
+      this.croppedImage = '';
+      this.originalImageBase64 = '';
+      this.currentRotation = 0;
+      this.currentFlipH = false;
+      this.currentFlipV = false;
+
+      if (this.showCropper) {
+        this.closeCropper();
+      }
+    }
+  }
+
+  closeCropper(): void {
+    CropperImageUtils.closeCropper(this.fileInput);
+  }
+
+  imageCropped(event: ImageCroppedEvent) {
+    CropperImageUtils.imageCropped(event)
+  }
+
+  // 5. Изображение загружено в cropper
+  onImageLoaded(): void {
+    console.log('Изображение загружено в cropper');
+
+    // После загрузки изображения применяем текущие трансформации
+    setTimeout(() => {
+      this.applyCssTransformToCropper();
+    }, 100);
+  }
+
+  // Применение CSS трансформаций к самому cropper
+  private applyCssTransformToCropper(): void {
+    // Пытаемся применить трансформации к внутренним элементам cropper
+    const sourceImage = document.querySelector('.ngx-ic-source-image') as HTMLElement;
+    const cropperContainer = document.querySelector('.cropper-container') as HTMLElement;
+
+    if (sourceImage) {
+      sourceImage.style.transform = CropperImageUtils.getPreviewTransform();
+      sourceImage.style.transformOrigin = 'center center';
+    }
+
+    if (cropperContainer) {
+      cropperContainer.style.transform = CropperImageUtils.getPreviewTransform();
+      cropperContainer.style.transformOrigin = 'center center';
+    }
+  }
+
+  // 6. Ошибка загрузки изображения
+  loadImageFailed(): void {
+    alert('Не удалось загрузить изображение. Пожалуйста, выберите другой файл.');
+    CropperImageUtils.cancelCrop();
+  }
+
+  applyCrop(): void {
+    console.log('applyCrop вызван');
+    console.log('croppedImage существует:', !!this.croppedImage);
+    console.log('Текущее значение avatar в форме:', this.cardForm.value.avatar);
+
+    // Проверяем, есть ли обрезанное изображение
+    if (!this.croppedImage) {
+      console.error('Нет обрезанного изображения!');
+      alert('Сначала обрежьте изображение');
+      return;
+    }
+
+    console.log('Длина croppedImage:', this.croppedImage.length);
+    console.log('Трансформации:', {
+      rotation: this.currentRotation,
+      flipH: this.currentFlipH,
+      flipV: this.currentFlipV
+    });
+
+    // Применяем трансформации, если они есть
+    if (this.currentRotation !== 0 || this.currentFlipH || this.currentFlipV) {
+      console.log('Применяем трансформации...');
+      CropperImageUtils.applyTransformationsToImage();
+    }
+
+    // else {
+    //   console.log('Трансформаций нет, сохраняем как есть');
+    //   // Только обновляем форму, не трогаем avatarPreview
+    //   this.cardNewForm.patchValue({
+    //     avatar: this.croppedImage
+    //   });
+    // }
+    // Если нет croppedFile (старая версия cropper), создаем из base64
+    if (!this.croppedFile && this.croppedImage && this.selectedFile) {
+        const fileName = `avatar_${Date.now()}.${CropperImageUtils.getFormatFromMimeType(this.selectedFile.type)}`;
+
+        // const fileName = this.selectedFile?.name || `avatar_${Date.now()}.png`;
+      this.croppedFile = CropperImageUtils.base64ToFile(this.croppedImage, fileName);
+    }
+
+    console.log('Файл готов к отправке:', this.croppedFile);
+    this.closeCropper();
+  }
 }

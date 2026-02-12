@@ -5,14 +5,15 @@
         <img src="{{user.avatar }}" alt="User image" class="User_img_image">
         <div class="User__active" *ngIf="!isEditCard">Status: {{ user.active ? 'Active' : 'Not active' }}</div>
         <div class="User_img_text" *ngIf="isEditCard">загрузить своё фото</div>
+        <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
       </div>
       <div class="User__id" *ngIf="!isEditCard">
         <div>ID: {{ user.id }}</div>
         <div>Url: {{ user.url }}</div>
       </div>
       <div class="User__load_action" *ngIf="isEditCard">
-        <button class="load-btn">Load</button>
-        <button class="delete-btn">Delete</button>
+        <button class="load-btn" (click)="openFileDialog()" [disabled]="CropperImageUtils.isUploading">Load</button>
+        <button class="delete-btn" (click)="deleteAvatar()" [disabled]="CropperImageUtils.isUploading">Delete</button>
       </div>
       <div class="User__firstName">
         <label for="firstName">Имя:</label>
@@ -73,3 +74,103 @@
     </div>
   </div>
 </section>
+
+<div class="cropper-modal" *ngIf="showCropper">
+  <div class="cropper-modal-content">
+    <div class="cropper-header">
+      <h3>Обрезка фотографии</h3>
+
+      <div class="transform-indicator" *ngIf="currentRotation !== 0 || currentFlipH || currentFlipV">
+        <span *ngIf="currentRotation !== 0">↻ {{currentRotation}}°</span>
+        <span *ngIf="currentFlipH">↔</span>
+        <span *ngIf="currentFlipV">↕</span>
+      </div>
+
+      <div class="cropper-controls">
+        <button type="button" class="btn-icon" (click)="CropperImageUtils.rotateLeft()" title="Повернуть влево">
+          ↶
+        </button>
+        <button type="button" class="btn-icon" (click)="CropperImageUtils.rotateRight()" title="Повернуть вправо">
+          ↷
+        </button>
+        <button type="button" class="btn-icon" (click)="CropperImageUtils.flipH()" title="Отразить по горизонтали">
+          ↔
+        </button>
+        <button type="button" class="btn-icon" (click)="CropperImageUtils.flipV()" title="Отразить по вертикали">
+          ↕
+        </button>
+        <button type="button" class="btn-icon" (click)="CropperImageUtils.resetTransform()" title="Сбросить трансформации">
+          ⟲
+        </button>
+        <button type="button" class="btn-icon" (click)="CropperImageUtils.cancelCrop()" title="Закрыть">
+          ×
+        </button>
+      </div>
+    </div>
+
+    <div class="cropper-body">
+      <!-- В версии 8.1.1 нет свойства transform -->
+      <div class="image-transform-container"
+           [style.transform]="CropperImageUtils.getPreviewTransform()"
+           [style.transform-origin]="'center center'">
+        <image-cropper
+          #imageCropper
+          [imageChangedEvent]="imageChangedEvent"
+          [maintainAspectRatio]="CropperImageUtils.maintainAspectRatio"
+          [aspectRatio]="CropperImageUtils.aspectRatio"
+          [resizeToWidth]="CropperImageUtils.resizeToWidth"
+          [format]="CropperImageUtils.cropperFormat"
+          [onlyScaleDown]="CropperImageUtils.onlyScaleDown"
+          [imageQuality]="CropperImageUtils.imageQuality"
+          (imageCropped)="imageCropped($event)"
+          (imageLoaded)="onImageLoaded()"
+          (loadImageFailed)="loadImageFailed()"
+          [ngStyle]="{'max-width': '600px', 'max-height': '500px'}"
+        >
+        </image-cropper>
+      </div>
+    </div>
+
+    <div class="cropper-footer">
+      <div class="aspect-ratios">
+        <button type="button"
+                class="aspect-btn"
+                [class.active]="CropperImageUtils.aspectRatio === 1"
+                (click)="CropperImageUtils.changeAspectRatio(1)">
+          1:1 (Квадрат)
+        </button>
+        <button type="button"
+                class="aspect-btn"
+                [class.active]="CropperImageUtils.aspectRatio === 4/3"
+                (click)="CropperImageUtils.changeAspectRatio(4/3)">
+          4:3
+        </button>
+        <button type="button"
+                class="aspect-btn"
+                [class.active]="CropperImageUtils.aspectRatio === 16/9"
+                (click)="CropperImageUtils.changeAspectRatio(16/9)">
+          16:9
+        </button>
+      </div>
+
+      <!-- Показываем текущие трансформации -->
+      <div class="transform-info" *ngIf="currentRotation !== 0 || currentFlipH || currentFlipV">
+        <small>
+          Примененные трансформации (будут применены после обрезки):
+          <span *ngIf="currentRotation !== 0">Поворот: {{currentRotation}}° </span>
+          <span *ngIf="currentFlipH">Отражение по горизонтали </span>
+          <span *ngIf="currentFlipV">Отражение по вертикали </span>
+        </small>
+      </div>
+
+      <div class="cropper-actions">
+        <button type="button" class="btn btn-outline" (click)="CropperImageUtils.cancelCrop()">
+          Отмена
+        </button>
+        <button type="button" class="btn btn-success" (click)="applyCrop()">
+          Применить
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
