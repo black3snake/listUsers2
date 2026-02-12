@@ -2,7 +2,7 @@
   <div class="container">
     <div class="User__grid" [formGroup]="cardForm">
       <div class="User_img">
-        <img src="{{user.avatar }}" alt="User image" class="User_img_image">
+        <img [src]="(cropperService.avatarPreview$ | async) || user.avatar " alt="User image" class="User_img_image">
         <div class="User__active" *ngIf="!isEditCard">Status: {{ user.active ? 'Active' : 'Not active' }}</div>
         <div class="User_img_text" *ngIf="isEditCard">загрузить своё фото</div>
         <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
@@ -12,8 +12,8 @@
         <div>Url: {{ user.url }}</div>
       </div>
       <div class="User__load_action" *ngIf="isEditCard">
-        <button class="load-btn" (click)="openFileDialog()" [disabled]="CropperImageUtils.isUploading">Load</button>
-        <button class="delete-btn" (click)="deleteAvatar()" [disabled]="CropperImageUtils.isUploading">Delete</button>
+        <button class="load-btn" (click)="openFileDialog()" [disabled]="(cropperService.isUploading$ | async)">Load</button>
+        <button class="delete-btn" (click)="deleteAvatar()" [disabled]="(cropperService.isUploading$ | async)">Delete</button>
       </div>
       <div class="User__firstName">
         <label for="firstName">Имя:</label>
@@ -75,15 +75,16 @@
   </div>
 </section>
 
-<div class="cropper-modal" *ngIf="showCropper">
+<div class="cropper-modal" *ngIf="(cropperService.showCropper$ | async)">
   <div class="cropper-modal-content">
     <div class="cropper-header">
       <h3>Обрезка фотографии</h3>
 
-      <div class="transform-indicator" *ngIf="currentRotation !== 0 || currentFlipH || currentFlipV">
-        <span *ngIf="currentRotation !== 0">↻ {{currentRotation}}°</span>
-        <span *ngIf="currentFlipH">↔</span>
-        <span *ngIf="currentFlipV">↕</span>
+      <div class="transform-indicator" *ngIf="cropperService.transformValue.rotation !== 0 || cropperService.transformValue.flipH
+      || cropperService.transformValue.flipV">
+        <span *ngIf="cropperService.transformValue.rotation !== 0">↻ {{cropperService.transformValue.rotation}}°</span>
+        <span *ngIf="cropperService.transformValue.flipH">↔</span>
+        <span *ngIf="cropperService.transformValue.flipV">↕</span>
       </div>
 
       <div class="cropper-controls">

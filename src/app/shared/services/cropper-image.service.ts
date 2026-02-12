@@ -90,6 +90,14 @@ export class CropperImageService {
     this.croppedFileSubject.next(value);
   }
 
+  get transformValue(): { rotation: number, flipH: boolean, flipV: boolean } {
+    return this.transform;
+  }
+  set transformValue(value: { rotation: number, flipH: boolean, flipV: boolean }) {
+    this.transform = value;
+    this.transformSubject.next(value);
+  }
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
 
@@ -174,6 +182,10 @@ export class CropperImageService {
   }
 
   // Трансформации
+  changeAspectRatio(ratio: number): void {
+    this.aspectRatio = ratio;
+  }
+
   rotateLeft(): void {
     this.transform.rotation -= 90;
     this.transformSubject.next(this.transform);
@@ -228,6 +240,64 @@ export class CropperImageService {
   private updatePreview(): void {
     this.cdr.detectChanges();
   }
+
+// Применение трансформаций к изображению
+  applyTransformationsToImage(): void {
+    if (!this.croppedImage) return;
+
+    const img = new Image();
+    img.src = this.croppedImage;
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) return;
+
+      // Рассчитываем размеры с учетом поворота
+      let width = img.width;
+      let height = img.height;
+
+      // if (this.currentRotation % 180 !== 0) {
+      if (this.transformValue.rotation % 180 !== 0) {
+        [width, height] = [height, width];
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      // Очищаем canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Настраиваем контекст для трансформаций
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(this.transformValue.rotation * Math.PI / 180);
+
+      if (this.transformValue.flipH) {
+        ctx.scale(-1, 1);
+      }
+      if (this.transformValue.flipV) {
+        ctx.scale(1, -1);
+      }
+
+      // Рисуем изображение
+      ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+      // Получаем трансформированное изображение
+      const transformedImage = canvas.toDataURL('image/png', this.imageQuality / 100);
+
+      // Обновляем preview
+      this.avatarPreview = transformedImage;
+
+      // Обновляем croppedImage
+      this.croppedImage = transformedImage;
+
+      // Создаем новый файл из трансформированного изображения
+      const fileName = this.selectedFile?.name || `avatar_${Date.now()}_transformed.png`;
+      this.croppedFile = this.base64ToFile(transformedImage, fileName);
+    };
+  }
+
 
 
 // Утилиты
