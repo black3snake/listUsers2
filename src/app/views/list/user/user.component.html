@@ -2,7 +2,7 @@
   <div class="container">
     <div class="User__grid" [formGroup]="cardForm">
       <div class="User_img">
-        <img [src]="(cropperService.avatarPreview$ | async) || user.avatar " alt="User image" class="User_img_image">
+        <img [src]="(cropperService.avatarPreview$ | async) || user.avatar" alt="User image" class="User_img_image">
         <div class="User__active" *ngIf="!isEditCard">Status: {{ user.active ? 'Active' : 'Not active' }}</div>
         <div class="User_img_text" *ngIf="isEditCard">загрузить своё фото</div>
         <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
@@ -88,22 +88,22 @@
       </div>
 
       <div class="cropper-controls">
-        <button type="button" class="btn-icon" (click)="CropperImageUtils.rotateLeft()" title="Повернуть влево">
+        <button type="button" class="btn-icon" (click)="cropperService.rotateLeft()" title="Повернуть влево">
           ↶
         </button>
-        <button type="button" class="btn-icon" (click)="CropperImageUtils.rotateRight()" title="Повернуть вправо">
+        <button type="button" class="btn-icon" (click)="cropperService.rotateRight()" title="Повернуть вправо">
           ↷
         </button>
-        <button type="button" class="btn-icon" (click)="CropperImageUtils.flipH()" title="Отразить по горизонтали">
+        <button type="button" class="btn-icon" (click)="cropperService.flipH()" title="Отразить по горизонтали">
           ↔
         </button>
-        <button type="button" class="btn-icon" (click)="CropperImageUtils.flipV()" title="Отразить по вертикали">
+        <button type="button" class="btn-icon" (click)="cropperService.flipV()" title="Отразить по вертикали">
           ↕
         </button>
-        <button type="button" class="btn-icon" (click)="CropperImageUtils.resetTransform()" title="Сбросить трансформации">
+        <button type="button" class="btn-icon" (click)="cropperService.resetTransform()" title="Сбросить трансформации">
           ⟲
         </button>
-        <button type="button" class="btn-icon" (click)="CropperImageUtils.cancelCrop()" title="Закрыть">
+        <button type="button" class="btn-icon" (click)="cropperService.cancelCrop()" title="Закрыть">
           ×
         </button>
       </div>
@@ -112,17 +112,17 @@
     <div class="cropper-body">
       <!-- В версии 8.1.1 нет свойства transform -->
       <div class="image-transform-container"
-           [style.transform]="CropperImageUtils.getPreviewTransform()"
+           [style.transform]="cropperService.getPreviewTransform()"
            [style.transform-origin]="'center center'">
         <image-cropper
           #imageCropper
-          [imageChangedEvent]="imageChangedEvent"
-          [maintainAspectRatio]="CropperImageUtils.maintainAspectRatio"
-          [aspectRatio]="CropperImageUtils.aspectRatio"
-          [resizeToWidth]="CropperImageUtils.resizeToWidth"
-          [format]="CropperImageUtils.cropperFormat"
-          [onlyScaleDown]="CropperImageUtils.onlyScaleDown"
-          [imageQuality]="CropperImageUtils.imageQuality"
+          [imageChangedEvent]="cropperService.imageChangedEvent"
+          [maintainAspectRatio]="cropperService.maintainAspectRatio"
+          [aspectRatio]="cropperService.aspectRatio"
+          [resizeToWidth]="cropperService.resizeToWidth"
+          [format]="cropperService.cropperFormat"
+          [onlyScaleDown]="cropperService.onlyScaleDown"
+          [imageQuality]="cropperService.imageQuality"
           (imageCropped)="imageCropped($event)"
           (imageLoaded)="onImageLoaded()"
           (loadImageFailed)="loadImageFailed()"
@@ -136,36 +136,37 @@
       <div class="aspect-ratios">
         <button type="button"
                 class="aspect-btn"
-                [class.active]="CropperImageUtils.aspectRatio === 1"
-                (click)="CropperImageUtils.changeAspectRatio(1)">
+                [class.active]="cropperService.aspectRatio === 1"
+                (click)="cropperService.changeAspectRatio(1)">
           1:1 (Квадрат)
         </button>
         <button type="button"
                 class="aspect-btn"
-                [class.active]="CropperImageUtils.aspectRatio === 4/3"
-                (click)="CropperImageUtils.changeAspectRatio(4/3)">
+                [class.active]="cropperService.aspectRatio === 4/3"
+                (click)="cropperService.changeAspectRatio(4/3)">
           4:3
         </button>
         <button type="button"
                 class="aspect-btn"
-                [class.active]="CropperImageUtils.aspectRatio === 16/9"
-                (click)="CropperImageUtils.changeAspectRatio(16/9)">
+                [class.active]="cropperService.aspectRatio === 16/9"
+                (click)="cropperService.changeAspectRatio(16/9)">
           16:9
         </button>
       </div>
 
       <!-- Показываем текущие трансформации -->
-      <div class="transform-info" *ngIf="currentRotation !== 0 || currentFlipH || currentFlipV">
+      <div class="transform-info" *ngIf="cropperService.transformValue.rotation !== 0 || cropperService.transformValue.flipH
+      || cropperService.transformValue.flipV">
         <small>
           Примененные трансформации (будут применены после обрезки):
-          <span *ngIf="currentRotation !== 0">Поворот: {{currentRotation}}° </span>
-          <span *ngIf="currentFlipH">Отражение по горизонтали </span>
-          <span *ngIf="currentFlipV">Отражение по вертикали </span>
+          <span *ngIf="cropperService.transformValue.rotation !== 0">Поворот: {{cropperService.transformValue.rotation}}° </span>
+          <span *ngIf="cropperService.transformValue.flipH">Отражение по горизонтали </span>
+          <span *ngIf="cropperService.transformValue.flipV">Отражение по вертикали </span>
         </small>
       </div>
 
       <div class="cropper-actions">
-        <button type="button" class="btn btn-outline" (click)="CropperImageUtils.cancelCrop()">
+        <button type="button" class="btn btn-outline" (click)="cropperService.cancelCrop()">
           Отмена
         </button>
         <button type="button" class="btn btn-success" (click)="applyCrop()">

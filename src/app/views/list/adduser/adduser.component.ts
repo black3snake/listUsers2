@@ -27,7 +27,7 @@ export class AdduserComponent implements OnInit {
 
   // Переменные для загрузки изображений
   selectedFile: File | null = null;
-  avatarPreview: string | SafeUrl = 'assets/images/default-avatar.png';
+  avatarPreview: string | SafeUrl = 'images/avatar-stub.png';
   showCropper = false;
   imageChangedEvent: any = '';
   croppedImage: string = '';
@@ -276,7 +276,7 @@ export class AdduserComponent implements OnInit {
   deleteAvatar(): void {
     if (confirm('Удалить текущую фотографию?')) {
       this.selectedFile = null;
-      this.avatarPreview = 'assets/images/default-avatar.png';
+      this.avatarPreview = 'images/avatar-stub.png';
       this.cardNewForm.patchValue({ avatar: '' });
       this.croppedImage = '';
       this.originalImageBase64 = '';

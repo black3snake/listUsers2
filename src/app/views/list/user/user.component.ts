@@ -84,6 +84,7 @@ export class UserComponent implements OnInit {
               this.user = data;
               this.loadingDataForm(this.user);
               this.initialFormValues = this.cardForm.getRawValue();
+              this.cropperService.avatarPreviewValue = this.user.avatar;
 
             },
             error: (err: HttpErrorResponse) => {
@@ -109,6 +110,7 @@ export class UserComponent implements OnInit {
         experience: user.experience?.toString() || '',
         phone: user.phone?.toString() || '',
         email: user.email?.toString() || '',
+        avatar: user.avatar.toString() || '',
       });
     }
   }
@@ -118,25 +120,43 @@ export class UserComponent implements OnInit {
     if (this.isEditCard) {
       this.cardForm.enable();
     } else {
-      this.updateCard(this.user.id)
+      this.updateCard(this.user.url)
       this.cardForm.disable();
     }
 
   }
 
-  updateCard(id: string) {
+  updateCard(url: string) {
     const changedValues = this.getChangedValues();
     if (Object.keys(changedValues).length === 0) {
       this._snackBar.open('Нет изменений для сохранения');
       return;
     }
+    // Получаем обрезанный файл из сервиса кроппера
+    const avatarFile = this.cropperService.croppedFileValue;
 
-    this.userService.updateUser(id, changedValues )
+    // Удаляем avatar из changedValues, если он там есть
+    if (changedValues.hasOwnProperty('avatar') && avatarFile) {
+      delete changedValues.avatar;
+    }
+
+    this.userService.updateUser(url, changedValues,  avatarFile )
       .subscribe( {
-        next: (updateUser: Partial<UserCardType> ) => {
+        next: (updatedUser: Partial<UserCardType> ) => {
           this._snackBar.open('Данные обновлены');
           // Обновляем начальные значения
-          this.initialFormValues = { ...this.initialFormValues, ...changedValues };
+          this.initialFormValues = {
+            ...this.initialFormValues,
+            ...changedValues
+          };
+          if (updatedUser.avatar) {
+            this.user.avatar = updatedUser.avatar;
+            this.cropperService.avatarPreviewValue = updatedUser.avatar;
+          }
+
+          // Сбрасываем состояние кроппера
+          this.cropperService.croppedFileValue = null;
+          this.cropperService.showCropperValue = false;
         },
         error: (err: HttpErrorResponse) => {
           if (err.error && err.error.message) {
@@ -175,7 +195,7 @@ export class UserComponent implements OnInit {
   deleteAvatar(): void {
     if (confirm('Удалить текущую фотографию?')) {
       this.cropperService.selectedFile = null;
-      this.cropperService.avatarPreviewValue = 'assets/images/default-avatar.png';
+      this.cropperService.avatarPreviewValue = '../../../../assets/images/avatar-stub.png';
       this.cardForm.patchValue({ avatar: '' });
       this.cropperService.croppedImageValue = '';
       this.cropperService.originalImageBase64 = '';
@@ -209,6 +229,7 @@ export class UserComponent implements OnInit {
     if (croppedFile) {
       // Ваша логика загрузки
       console.log('File ready for upload:', croppedFile);
+      this.cardForm.patchValue({avatar: croppedFile.name})
     }
   }
 

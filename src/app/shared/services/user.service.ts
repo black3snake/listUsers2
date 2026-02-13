@@ -52,8 +52,27 @@ export class UserService {
 
   }
 
-  updateUser(url: string, data: Partial<UserCardType>) {
-    return this.http.put<Partial<UserCardType>>(environment.apiUrl + 'user/' + url, data);
+  updateUser(url: string, data: Partial<UserCardType>, avatarFile?: File | null): Observable<Partial<UserCardType>> {
+    const formData = new FormData();
+    Object.keys(data).forEach(key => {
+      const value = data[key as keyof UserCardType];
+      // Не добавляем null/undefined и avatar отдельно
+      if (value !== null && value !== undefined && key !== 'avatar') {
+        formData.append(key, String(value));
+      }
+    });
+    // Добавляем файл аватара, если он есть
+    if (avatarFile) {
+      formData.append('avatar', avatarFile, avatarFile.name);
+    } else if (data.avatar === '') {
+      formData.append('avatar', String(''));
+    }
+
+    return this.http.put<Partial<UserCardType>>(environment.apiUrl + 'user/' + url, formData);
   }
+
+  // updateUser(url: string, data: Partial<UserCardType>) {
+  //   return this.http.put<Partial<UserCardType>>(environment.apiUrl + 'user/' + url, data);
+  // }
 
 }

@@ -7,7 +7,7 @@ import {ImageCroppedEvent, OutputFormat} from "ngx-image-cropper";
 export class CropperImageService {
   // Используем BehaviorSubject для реактивности
   private showCropperSubject = new BehaviorSubject<boolean>(false);
-  private avatarPreviewSubject = new BehaviorSubject<string | SafeUrl>('assets/images/default-avatar.png');
+  private avatarPreviewSubject = new BehaviorSubject<string | SafeUrl>('../../../../assets/images/avatar-stub.png');
   private croppedImageSubject = new BehaviorSubject<string>('');
   private croppedFileSubject = new BehaviorSubject<File | null>(null);
   private uploadProgressSubject = new BehaviorSubject<number>(0);
@@ -29,7 +29,7 @@ export class CropperImageService {
 
   // Состояние
   private showCropper = false;
-  private avatarPreview: string | SafeUrl = 'assets/images/default-avatar.png';
+  private avatarPreview: string | SafeUrl = '../../../../assets/images/avatar-stub.png';
   private croppedImage = '';
   private croppedFile: File | null = null;
   private transform = { rotation: 0, flipH: false, flipV: false };
