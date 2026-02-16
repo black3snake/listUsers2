@@ -9,6 +9,7 @@ const routes: Routes = [
     component: LayoutComponent,
     children: [
       {path: '', component: MainComponent},
+      {path: 'users', component: MainComponent},
       {path: '', loadChildren:() =>import('./views/list/list.module').then(m => m.ListModule)},
 
       ]

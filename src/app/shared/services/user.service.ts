@@ -32,18 +32,18 @@ export class UserService {
   }
 
   createUserFlexible(params: UserCardType | FormData): Observable<UserCardType | DefaultResponseType> {
-    let options = {};
-    if (!(params instanceof FormData)) {
-      options = {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-    }
+    // let options = {};
+    // if (!(params instanceof FormData)) {
+    //   options = {
+    //     headers: {
+    //       'Content-Type': 'application/json'
+    //     }
+    //   };
+    // }
     return this.http.post<UserCardType | DefaultResponseType>(
       environment.apiUrl + 'user',
       params,
-      options
+      // options
     );
   }
 
@@ -65,7 +65,7 @@ export class UserService {
     if (avatarFile) {
       formData.append('avatar', avatarFile, avatarFile.name);
     } else if (data.avatar === '') {
-      formData.append('avatar', String(''));
+      formData.append('avatar', String(''));  // отправим указание чтобы аватар удалить
     }
 
     return this.http.put<Partial<UserCardType>>(environment.apiUrl + 'user/' + url, formData);
