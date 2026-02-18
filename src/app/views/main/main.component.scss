@@ -1,7 +1,7 @@
 @import "_variables.scss";
 
 .main {
-  margin-top: 60px;
+  margin-top: 30px;
 
   .container {
     .main_title {
@@ -58,10 +58,12 @@
       .main_table_title {
         display: grid;
         width: 100%;
-        grid-template-columns: 100px 1fr 1fr 100px;
+        grid-template-columns: 100px 1fr 1fr 1fr 100px;
         gap: 10px;
         padding: 0 10px;
         background-color: #e7e7e7;
+        margin-bottom: 3px;
+        border-radius: 4px;
 
         .main_table_title_item {
           box-sizing: border-box;
@@ -85,13 +87,13 @@
         border: 1px solid #ccc;
         border-radius: 4px;
         margin-bottom: 5px;
-        padding: 5px 10px;
-        grid-template-columns: 100px 1fr 1fr 100px;
+        padding: 3px 10px;
+        grid-template-columns: 100px 1fr 1fr 1fr 100px;
         gap: 10px;
 
         .main_row_item {
           box-sizing: border-box;
-          padding: 10px;
+          padding: 7px 10px;
           border-right: 1px solid #ccc;
         }
 

@@ -48,8 +48,8 @@ export class UserService {
   }
 
 
-  deleteUser(url: string) {
-
+  deleteUser(id: string): Observable<DefaultResponseType> {
+    return this.http.delete<DefaultResponseType>(environment.apiUrl + 'user/' + id);
   }
 
   updateUser(url: string, data: Partial<UserCardType>, avatarFile?: File | null): Observable<Partial<UserCardType>> {

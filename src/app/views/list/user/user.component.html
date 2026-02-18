@@ -4,9 +4,10 @@
       <div class="User_img">
         <img [src]="(cropperService.avatarPreview$ | async) || user.avatar" alt="User image" class="User_img_image">
         <div class="User__active" *ngIf="!isEditCard" [ngStyle]="{'background': (showActiveUser$ | async) ? 'green': '', 'color': (showActiveUser$ | async) ? 'white': '' }">
-          Status: {{ (showActiveUser$ | async) ||  user.active ? 'Active' : 'Not active' }}</div>
+          Status: {{ (showActiveUser$ | async) || user.active ? 'Active' : 'Not active' }}
+        </div>
         <div class="User_img_action">
-          <button class="active_btn" (click)="actionUser()" *ngIf="isEditCard">{{showActiveUserValue ? 'Disable User' : 'Enable User'}}</button>
+          <button class="active_btn" (click)="actionUser()" *ngIf="isEditCard">{{ showActiveUserValue ? 'Disable User' : 'Enable User' }}</button>
         </div>
         <div class="User_img_text" *ngIf="isEditCard">загрузить своё фото</div>
         <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
@@ -16,8 +17,10 @@
         <div>Url: {{ user.url }}</div>
       </div>
       <div class="User__load_action" *ngIf="isEditCard">
-        <button class="load-btn" (click)="openFileDialog()" [disabled]="(cropperService.isUploading$ | async)">Load</button>
-        <button class="delete-btn" (click)="deleteAvatar()" [disabled]="(cropperService.isUploading$ | async)">Delete</button>
+        <button class="load-btn" (click)="openFileDialog()" [disabled]="(cropperService.isUploading$ | async)">Load
+        </button>
+        <button class="delete-btn" (click)="deleteAvatar()" [disabled]="(cropperService.isUploading$ | async)">Delete
+        </button>
       </div>
       <div class="User__firstName">
         <label for="firstName">Имя:</label>
@@ -67,30 +70,32 @@
         <div>Заметка</div>
         <textarea name="" id="" cols="40" rows="20" class="textArea"></textarea>
       </div>
-      <!--      <div class="User__email">Email: <p>{{ user.address }}</p></div>-->
       <div class="User__createDate">Создан: {{ user.createdAt | date: 'dd.MM.yyyy HH:mm' }}</div>
     </div>
     <div class="user__action">
-      <button type="button" routerLink="/">Back</button>
-      <button type="button" (click)="editCard()" [ngStyle]="{'background': isEditCard ? 'green': '', 'color': isEditCard ? 'white': '' }" [disabled]="cardForm.invalid">
-        {{ !isEditCard ? 'Edit' : 'Save'}}
-      </button>
+      <div class="user__action_left">
+        <button type="button" routerLink="/">Back</button>
+        <button type="button" (click)="editCard()" [ngStyle]="{'background': isEditCard ? 'green': '', 'color': isEditCard ? 'white': '' }" [disabled]="cardForm.invalid">
+          {{ !isEditCard ? 'Edit' : 'Save' }}
+        </button>
+      </div>
+      <div class="user__action_right">
+        <button type="button" (click)="deleteCard(user.id)">Delete User</button>
+      </div>
     </div>
   </div>
 </section>
-
 <div class="cropper-modal" *ngIf="(cropperService.showCropper$ | async)">
   <div class="cropper-modal-content">
     <div class="cropper-header">
       <h3>Обрезка фотографии</h3>
-
       <div class="transform-indicator" *ngIf="cropperService.transformValue.rotation !== 0 || cropperService.transformValue.flipH
       || cropperService.transformValue.flipV">
-        <span *ngIf="cropperService.transformValue.rotation !== 0">↻ {{cropperService.transformValue.rotation}}°</span>
+        <span *ngIf="cropperService.transformValue.rotation !== 0">↻ {{ cropperService.transformValue.rotation }}
+                                                                   °</span>
         <span *ngIf="cropperService.transformValue.flipH">↔</span>
         <span *ngIf="cropperService.transformValue.flipV">↕</span>
       </div>
-
       <div class="cropper-controls">
         <button type="button" class="btn-icon" (click)="cropperService.rotateLeft()" title="Повернуть влево">
           ↶
@@ -112,7 +117,6 @@
         </button>
       </div>
     </div>
-
     <div class="cropper-body">
       <!-- В версии 8.1.1 нет свойства transform -->
       <div class="image-transform-container"
@@ -135,7 +139,6 @@
         </image-cropper>
       </div>
     </div>
-
     <div class="cropper-footer">
       <div class="aspect-ratios">
         <button type="button"
@@ -157,18 +160,17 @@
           16:9
         </button>
       </div>
-
       <!-- Показываем текущие трансформации -->
       <div class="transform-info" *ngIf="cropperService.transformValue.rotation !== 0 || cropperService.transformValue.flipH
       || cropperService.transformValue.flipV">
         <small>
           Примененные трансформации (будут применены после обрезки):
-          <span *ngIf="cropperService.transformValue.rotation !== 0">Поворот: {{cropperService.transformValue.rotation}}° </span>
+          <span *ngIf="cropperService.transformValue.rotation !== 0">Поворот: {{ cropperService.transformValue.rotation }}
+                                                                     ° </span>
           <span *ngIf="cropperService.transformValue.flipH">Отражение по горизонтали </span>
           <span *ngIf="cropperService.transformValue.flipV">Отражение по вертикали </span>
         </small>
       </div>
-
       <div class="cropper-actions">
         <button type="button" class="btn btn-outline" (click)="cropperService.cancelCrop()">
           Отмена

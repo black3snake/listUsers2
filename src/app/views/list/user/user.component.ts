@@ -1,5 +1,5 @@
 import {Component, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {HttpErrorResponse} from "@angular/common/http";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {FormBuilder, Validators} from "@angular/forms";
@@ -9,6 +9,7 @@ import {UserCardType} from "../../../../types/user-card.type";
 import {ImageCropperComponent, ImageCroppedEvent, OutputFormat} from "ngx-image-cropper";
 import {CropperImageService} from "../../../shared/services/cropper-image.service";
 import {BehaviorSubject} from "rxjs";
+import {DefaultResponseType} from "../../../../types/default-response.type";
 
 @Component({
   selector: 'app-user',
@@ -38,6 +39,7 @@ export class UserComponent implements OnInit {
   private userService = inject(UserService);
   private _snackBar = inject(MatSnackBar);
   private fb = inject(FormBuilder);
+  private router = inject(Router);
   private initialFormValues!: UserCardType;
   public cropperService = inject(CropperImageService);
   private showActiveUserSubject = new BehaviorSubject<boolean>(false);
@@ -96,7 +98,10 @@ export class UserComponent implements OnInit {
             next: (data: UserItem) => {
               this.user = data;
               this.loadingDataForm(this.user);
-              this.initialFormValues = {...this.cardForm.getRawValue(), ...{active:this.user.active}};
+              this.initialFormValues = {
+                ...this.cardForm.getRawValue(),
+                active:this.user.active
+              };
               this.cropperService.avatarPreviewValue = this.user.avatar;
               this.showActiveUserValue = this.user.active;
             },
@@ -211,6 +216,30 @@ export class UserComponent implements OnInit {
     console.log(`Состояние UserActive: ${this.showActiveUser}`)
   }
 
+  deleteCard(id: string) {
+    if (confirm('Удалить текущего пользователя?')) {
+      this.userService.deleteUser(id).subscribe({
+        next: (response: DefaultResponseType) => {
+          if (!response.error) {
+            this._snackBar.open('Пользователь удален');
+            // Перенаправление или обновление списка
+            this.router.navigate(['/users']);
+          } else {
+            this._snackBar.open(response.message);
+          }
+        },
+        error: (err) => {
+          console.error('Delete error:', err);
+          this._snackBar.open('Ошибка при удалении');
+        }
+      });
+
+    }
+  }
+
+
+
+  // методы для работы с cropper, который работает как сервис для каждого компонента
   onFileSelected(event: Event): void {
     this.cropperService.onFileSelected(event);
   }

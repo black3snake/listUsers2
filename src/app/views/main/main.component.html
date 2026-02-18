@@ -16,14 +16,16 @@
     <div class="main_table">
       <div class="main_table_title">
         <div class="main_table_title_item" (click)="sortTable('id')">id</div>
-        <div class="main_table_title_item" (click)="sortTable('name')">Fullname</div>
-        <div class="main_table_title_item" (click)="sortTable('email')">Address</div>
+        <div class="main_table_title_item" (click)="sortTable('firstName')">Fullname</div>
+        <div class="main_table_title_item" (click)="sortTable('email')">Email</div>
+        <div class="main_table_title_item" (click)="sortTable('address')">Address</div>
         <div class="main_table_title_item" (click)="filterByActive()" *ngIf="isNotFilter">All users</div>
         <div class="main_table_title_item" (click)="filterByActive()" *ngIf="!isNotFilter">{{ isFilterActive ? 'Active' : 'Not active' }}</div>
       </div>
       <div class="main_row" *ngFor="let user of displayedUsers" (click)="chooseUser(user.url)">
         <div class="main_row_item">{{ user.id | symbolLess }}</div>
         <div class="main_row_item">{{ user.firstName + ' ' + user.lastName }}</div>
+        <div class="main_row_item">{{ user.email }}</div>
         <div class="main_row_item">{{ user.address }}</div>
         <div class="main_row_item">{{ user.active ? 'Yes' : 'No' }}</div>
       </div>
