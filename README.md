@@ -18,3 +18,4 @@ Angular version 16.
 |-----------------------------------------------------|
 | <img src="image1.jpg" alt="Скриншот 1" width="500"> |
 | <img src="image2.jpg" alt="Скриншот 1" width="500"> |
+| <img src="image3.jpg" alt="Скриншот 1" width="500"> |
