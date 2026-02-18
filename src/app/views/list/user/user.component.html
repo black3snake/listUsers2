@@ -3,7 +3,11 @@
     <div class="User__grid" [formGroup]="cardForm">
       <div class="User_img">
         <img [src]="(cropperService.avatarPreview$ | async) || user.avatar" alt="User image" class="User_img_image">
-        <div class="User__active" *ngIf="!isEditCard">Status: {{ user.active ? 'Active' : 'Not active' }}</div>
+        <div class="User__active" *ngIf="!isEditCard" [ngStyle]="{'background': (showActiveUser$ | async) ? 'green': '', 'color': (showActiveUser$ | async) ? 'white': '' }">
+          Status: {{ (showActiveUser$ | async) ||  user.active ? 'Active' : 'Not active' }}</div>
+        <div class="User_img_action">
+          <button class="active_btn" (click)="actionUser()" *ngIf="isEditCard">{{showActiveUserValue ? 'Disable User' : 'Enable User'}}</button>
+        </div>
         <div class="User_img_text" *ngIf="isEditCard">загрузить своё фото</div>
         <input #fileInput type="file" accept="image/*" (change)="onFileSelected($event)" style="display: none;">
       </div>
@@ -64,7 +68,7 @@
         <textarea name="" id="" cols="40" rows="20" class="textArea"></textarea>
       </div>
       <!--      <div class="User__email">Email: <p>{{ user.address }}</p></div>-->
-      <div class="User__createDate">Создан: {{ user.createdAt }}</div>
+      <div class="User__createDate">Создан: {{ user.createdAt | date: 'dd.MM.yyyy HH:mm' }}</div>
     </div>
     <div class="user__action">
       <button type="button" routerLink="/">Back</button>

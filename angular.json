@@ -18,6 +18,11 @@
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist/list-users",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets/styles"
+              ]
+            },
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -89,6 +94,11 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/assets/styles"
+              ]
+            },
             "polyfills": [
               "zone.js",
               "zone.js/testing"

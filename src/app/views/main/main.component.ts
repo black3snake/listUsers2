@@ -52,7 +52,7 @@ export class MainComponent implements OnInit {
           .subscribe({
             next: (datas: UsersType) => {
               this.pages = [];
-              for (let i = 1; i <= datas.pagination.page; i++) {
+              for (let i = 1; i <= datas.pagination.totalPages; i++) {
                 this.pages.push(i);
               }
               this.displayedUsers = datas.data;
@@ -154,4 +154,28 @@ export class MainComponent implements OnInit {
     this.router.navigate(['user', url]);
   }
 
+  openPrevPage() {
+    if (this.activeParams.page && this.activeParams.page > 1) {
+      this.activeParams.page--;
+      this.router.navigate(['/users'], {
+        queryParams: this.activeParams
+      });
+    }
+  }
+
+  openPage(page: number) {
+    this.activeParams.page = page;
+    this.router.navigate(['/users'], {
+      queryParams: this.activeParams
+    });
+  }
+
+  openNextPage() {
+    if (this.activeParams.page && this.activeParams.page < this.pages.length) {
+      this.activeParams.page++;
+      this.router.navigate(['/users'], {
+        queryParams: this.activeParams
+      });
+    }
+  }
 }

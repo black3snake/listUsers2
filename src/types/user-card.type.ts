@@ -7,4 +7,5 @@ export type UserCardType = {
   email: string | null,
   phone: string | null,
   avatar?: string | null,
+  active: boolean | null,
 }

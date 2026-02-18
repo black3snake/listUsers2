@@ -8,6 +8,7 @@ import {UserService} from "../../../shared/services/user.service";
 import {UserCardType} from "../../../../types/user-card.type";
 import {ImageCropperComponent, ImageCroppedEvent, OutputFormat} from "ngx-image-cropper";
 import {CropperImageService} from "../../../shared/services/cropper-image.service";
+import {BehaviorSubject} from "rxjs";
 
 @Component({
   selector: 'app-user',
@@ -39,6 +40,9 @@ export class UserComponent implements OnInit {
   private fb = inject(FormBuilder);
   private initialFormValues!: UserCardType;
   public cropperService = inject(CropperImageService);
+  private showActiveUserSubject = new BehaviorSubject<boolean>(false);
+  showActiveUser$ = this.showActiveUserSubject.asObservable();
+  private showActiveUser = false;
   isEditCard: boolean = false;
 
   cardForm = this.fb.group({
@@ -74,6 +78,15 @@ export class UserComponent implements OnInit {
     return this.cardForm.get('phone');
   }
 
+  get showActiveUserValue() {
+    return this.showActiveUser
+  }
+  set showActiveUserValue(value: boolean) {
+    this.showActiveUser = value;
+    this.showActiveUserSubject.next(value);
+  }
+
+
   ngOnInit(): void {
     this.activatedRoute.params.subscribe(params => {
       if (params['url']) {
@@ -83,9 +96,9 @@ export class UserComponent implements OnInit {
             next: (data: UserItem) => {
               this.user = data;
               this.loadingDataForm(this.user);
-              this.initialFormValues = this.cardForm.getRawValue();
+              this.initialFormValues = {...this.cardForm.getRawValue(), ...{active:this.user.active}};
               this.cropperService.avatarPreviewValue = this.user.avatar;
-
+              this.showActiveUserValue = this.user.active;
             },
             error: (err: HttpErrorResponse) => {
               if (err.error && err.error.message) {
@@ -169,19 +182,33 @@ export class UserComponent implements OnInit {
   }
 
   getChangedValues(): Partial<UserCardType> {
-    const currentValues: UserCardType = this.cardForm.getRawValue();
+    const currentValues: UserCardType = {
+      ...this.cardForm.getRawValue(),
+      active: this.showActiveUser
+    };
     const changedValues: Partial<UserCardType> = {};
-    Object.keys(currentValues).forEach(key => {
-      const typedKey = key as keyof UserCardType;
-      const currentValue = currentValues[typedKey];
-      const initialValue = this.initialFormValues[typedKey];
 
-      // Сравниваем значения (учитываем разные типы)
-      if (JSON.stringify(currentValue) !== JSON.stringify(initialValue)) {
-        changedValues[typedKey] = currentValue;
-      }
+    (Object.keys(currentValues) as Array<keyof UserCardType>).forEach(key => {
+      // const typedKey = key as keyof UserCardType;
+      const currentValue = currentValues[key];
+      const initialValue = this.initialFormValues[key];
+
+    const hasChanged = currentValue !== initialValue &&
+      (JSON.stringify(currentValue) !== JSON.stringify(initialValue));
+
+    if (hasChanged) {
+      changedValues[key] = currentValue as any;
+    }
+
     });
     return changedValues;
+  }
+
+
+
+  actionUser() {
+    this.showActiveUserValue = !this.showActiveUserValue;
+    console.log(`Состояние UserActive: ${this.showActiveUser}`)
   }
 
   onFileSelected(event: Event): void {
