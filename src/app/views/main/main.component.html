@@ -2,10 +2,10 @@
   <div class="container">
     <div class="main_title">Список пользователей</div>
     <div class="main_action">
-      <input type="text" [(ngModel)]="searchTerm" (input)="filterUsers()"
+      <input type="text" [formControl]="searchField"
              placeholder="Search users by name..." class="search-input">
       <div class="main_action_right">
-        <button routerLink="user" class="add-user">
+        <button class="add-user" (click)="newUser()" >
           Create User
         </button>
         <button (click)="resetFilters()" class="reset-btn">

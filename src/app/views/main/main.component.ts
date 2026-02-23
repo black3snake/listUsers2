@@ -1,24 +1,27 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {UserItem, UsersType} from "../../../types/users.type";
 import {ActivatedRoute, Router} from "@angular/router";
 import {UserService} from "../../shared/services/user.service";
 import {ActiveParamsType} from "../../../types/active-params.type";
 import {HttpErrorResponse} from "@angular/common/http";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {FormControl} from "@angular/forms";
+import {debounceTime, isEmpty, Subject, takeUntil} from "rxjs";
+import {ActiveParamsUtil} from "../../shared/utils/active-params.util";
 
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss']
 })
-export class MainComponent implements OnInit {
+export class MainComponent implements OnInit, OnDestroy {
   displayedUsers: UserItem[] = [];
   originalUsers: UserItem[] = [];
   currentSortField: string = '';
   isAscending: boolean = true;
   isFilterActive: boolean = false;
   isNotFilter: boolean = true;
-  searchTerm: string = '';
+  private isEmpty: boolean = false;
   activeParams: ActiveParamsType = {};
   pages: number[] = [];
 
@@ -26,49 +29,117 @@ export class MainComponent implements OnInit {
   private router = inject(Router);
   private activatedRoute = inject(ActivatedRoute);
   private _snackBar = inject(MatSnackBar);
+  searchField = new FormControl();
+  users: UserItem[] = [];
+  showedSearch: boolean = false;
+  private destroy$ = new Subject<void>();
 
   constructor() {
   }
 
   ngOnInit(): void {
+
     this.activatedRoute.queryParamMap
-      .subscribe(params => {
-        if (params.has('page')) {
-          const pageParam = params.get('page');
-          if (pageParam !== null) {
-            const pageNumber = parseInt(pageParam, 10);
-            // Проверяем, что это валидное число больше 0
-            if (!isNaN(pageNumber) && pageNumber > 0) {
-              this.activeParams.page = pageNumber;
+      .subscribe(queryParamMap => {
+        this.activeParams = ActiveParamsUtil.processParams(queryParamMap);
+        if(this.searchField.get('query') === null && this.activeParams.query) {
+          this.searchField.setValue(this.activeParams.query);
+        }
+        this.getUsers(this.activeParams, this.isEmpty);
+
+        this.searchField.valueChanges
+          .pipe(
+            debounceTime(500),
+            takeUntil(this.destroy$)
+          )
+          .subscribe(value => {
+            if (value && value.length > 2) {
+              this.activeParams.query = value;
+              this.isEmpty = false;
+            } else if (value.length === 0) {
+              delete this.activeParams.query;
+              this.isEmpty = false;
+            }
+            if (value && value.length < 3) {
+              this.isEmpty = true
+            }
+            this.getUsers(this.activeParams, this.isEmpty);
+          });
+
+      });
+  }
+
+  getUsers(activeParams?: ActiveParamsType, isEmpty: boolean = false) {
+    if (!isEmpty) {
+      const param = activeParams || {page: 1}
+      this.userService.getUsers(param)
+        .subscribe({
+          next: (datas: UsersType) => {
+            this.pages = [];
+            for (let i = 1; i <= datas.pagination.totalPages; i++) {
+              this.pages.push(i);
+            }
+            this.displayedUsers = datas.data;
+            this.originalUsers = datas.data;
+
+            this.router.navigate(['/users'], {
+              queryParams: this.activeParams
+            });
+          },
+          error: (err: HttpErrorResponse) => {
+            if (err.error && err.error.message) {
+              this._snackBar.open(err.error.message);
             } else {
-              this.activeParams.page = 1;
+              this._snackBar.open('Не могу получить доступ к серверу');
             }
           }
+        })
+    } else {
+      this.displayedUsers = [];
+      this.pages = [];
+    }
+  }
+
+  searchResult(activeParams?: ActiveParamsType) {
+    this.searchField.valueChanges
+      .pipe(
+        debounceTime(500),
+      )
+      .subscribe(value => {
+        if (value && value.length > 2) {
+          this.userService.searchUsers(value)
+            .subscribe({
+              next: (datas: UsersType) => {
+                this.pages = [];
+                for (let i = 1; i <= datas.pagination.totalPages; i++) {
+                  this.pages.push(i);
+                }
+                this.displayedUsers = datas.data;
+                this.showedSearch = true;
+                this.activeParams = {
+                  ...this.activeParams,
+                  query: value
+                }
+                this.router.navigate(['/users/search'], {
+                  queryParams: this.activeParams
+                });
+              },
+              error: (err: HttpErrorResponse) => {
+                if (err.error && err.error.message) {
+                  this._snackBar.open(err.error.message);
+                } else {
+                  this._snackBar.open('Ошибка ответа от сервера при поиске')
+                }
+              }
+            })
+        } else if (value.length === 0) {
+          this.getUsers();
+          this.showedSearch = false;
         } else {
-          this.activeParams.page = 1
+          this.displayedUsers = [];
+
         }
-
-        this.userService.getUsers(this.activeParams)
-          .subscribe({
-            next: (datas: UsersType) => {
-              this.pages = [];
-              for (let i = 1; i <= datas.pagination.totalPages; i++) {
-                this.pages.push(i);
-              }
-              this.displayedUsers = datas.data;
-              this.originalUsers = datas.data;
-            },
-            error: (err: HttpErrorResponse) => {
-              if (err.error && err.error.message) {
-                this._snackBar.open(err.error.message);
-              } else {
-                this._snackBar.open('Не могу получить доступ к серверу');
-              }
-            }
-          })
       })
-
-
   }
 
   sortTable(field: string): void {
@@ -121,10 +192,8 @@ export class MainComponent implements OnInit {
     this.isNotFilter = true;
   }
 
-  filterUsers() {
 
-  }
-  // Метод фильтрации
+  // Метод фильтрации локальный
   // filterUsers(): void {
   //   if (!this.searchTerm) {
   //     this.displayedUsers = this.usersDbService.getUsers();
@@ -151,7 +220,11 @@ export class MainComponent implements OnInit {
 
 
   chooseUser(url: string) {
-    this.router.navigate(['user', url]);
+    this.router.navigate(['/user', url]);
+  }
+
+  newUser() {
+    this.router.navigate(['/user']);
   }
 
   openPrevPage() {
@@ -177,5 +250,10 @@ export class MainComponent implements OnInit {
         queryParams: this.activeParams
       });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

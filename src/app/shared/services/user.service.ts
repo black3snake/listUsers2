@@ -23,10 +23,6 @@ export class UserService {
     return this.http.get<UserItem>(environment.apiUrl + 'user/' + url);
   }
 
-  searchUsers(query: string): Observable<UsersType> {
-    return this.http.get<UsersType>(environment.apiUrl + 'users/search?query=' + query);
-  }
-
   createUser(params: UserCardType): Observable<UserCardType | DefaultResponseType> {
     return this.http.post<UserCardType | DefaultResponseType>(environment.apiUrl + 'user', params);
   }
@@ -50,6 +46,10 @@ export class UserService {
 
   deleteUser(id: string): Observable<DefaultResponseType> {
     return this.http.delete<DefaultResponseType>(environment.apiUrl + 'user/' + id);
+  }
+
+  searchUsers(query: string): Observable<UsersType> {
+    return this.http.get<UsersType>(environment.apiUrl + 'users/search?query=' + query);
   }
 
   updateUser(url: string, data: Partial<UserCardType>, avatarFile?: File | null): Observable<Partial<UserCardType>> {
