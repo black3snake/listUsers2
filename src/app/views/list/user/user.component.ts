@@ -295,4 +295,8 @@ export class UserComponent implements OnInit {
       this.deleteAvatar();
     }
   }
+
+  backMain() {
+    this.router.navigate(['/users'])
+  }
 }

@@ -39,34 +39,40 @@ export class MainComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
+    this.searchField.valueChanges
+      .pipe(
+        debounceTime(500),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(value => {
+        if (value && value.length > 2) {
+          this.activeParams.query = value;
+          this.isEmpty = false;
+        } else if (value.length === 0) {
+          delete this.activeParams.query;
+          this.isEmpty = false;
+        }
+        if (value && value.length < 3) {
+          this.isEmpty = true
+        }
+
+        this.router.navigate(['/users'], {
+          queryParams: this.activeParams
+        });
+
+      });
+
     this.activatedRoute.queryParamMap
       .subscribe(queryParamMap => {
         this.activeParams = ActiveParamsUtil.processParams(queryParamMap);
-        if(this.searchField.get('query') === null && this.activeParams.query) {
+        if (this.searchField.get('query') === null && this.activeParams.query) {
           this.searchField.setValue(this.activeParams.query);
         }
         this.getUsers(this.activeParams, this.isEmpty);
 
-        this.searchField.valueChanges
-          .pipe(
-            debounceTime(500),
-            takeUntil(this.destroy$)
-          )
-          .subscribe(value => {
-            if (value && value.length > 2) {
-              this.activeParams.query = value;
-              this.isEmpty = false;
-            } else if (value.length === 0) {
-              delete this.activeParams.query;
-              this.isEmpty = false;
-            }
-            if (value && value.length < 3) {
-              this.isEmpty = true
-            }
-            this.getUsers(this.activeParams, this.isEmpty);
-          });
-
       });
+
+
   }
 
   getUsers(activeParams?: ActiveParamsType, isEmpty: boolean = false) {

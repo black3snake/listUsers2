@@ -74,7 +74,7 @@
     </div>
     <div class="user__action">
       <div class="user__action_left">
-        <button type="button" routerLink="/">Back</button>
+        <button type="button" (click)="backMain()">Back</button>
         <button type="button" (click)="editCard()" [ngStyle]="{'background': isEditCard ? 'green': '', 'color': isEditCard ? 'white': '' }" [disabled]="cardForm.invalid">
           {{ !isEditCard ? 'Edit' : 'Save' }}
         </button>
