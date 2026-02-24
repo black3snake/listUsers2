@@ -374,6 +374,12 @@
     pointer-events: none !important;
   }
 
+  .ngx-ic-cropper {
+
+    &::after {
+      opacity: .90 !important;
+    }
+  }
   .cropper-point {
     background-color: #fff !important;
     border: 1px solid #000 !important;
