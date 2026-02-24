@@ -12,7 +12,8 @@ export class SymbolLessPipe implements PipeTransform {
     const match = value.match(/^(.{2}).*(.{4})$/);
 
     if (match) {
-      return `${match[1]}..${match[2]}`;
+      // return `${match[1]}..${match[2]}`;
+      return `.${match[2]}`;
     }
     return value;
   }

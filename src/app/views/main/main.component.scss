@@ -8,11 +8,13 @@
       font-size: 32px;
       margin-bottom: 20px;
     }
+
     .main_action {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
+
       input {
         width: 200px;
         padding: 7px 10px;
@@ -21,33 +23,38 @@
         outline: none;
       }
 
-      }
-      .main_action_right {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 10px;
-        .add-user {
-          padding: 7px 10px;
-          border-radius: 5px;
-          border: transparent;
-          cursor: pointer;
-          width: 100px;
-          background-color: #1eb61e;
-          color: #fff;
-          &:hover {
-            background-color: #0d7d0d;
-          }
+    }
+
+    .main_action_right {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+
+      .add-user {
+        padding: 7px 10px;
+        border-radius: 5px;
+        border: transparent;
+        cursor: pointer;
+        width: 100px;
+        background-color: #1eb61e;
+        color: #fff;
+
+        &:hover {
+          background-color: #0d7d0d;
         }
-        .reset-btn {
-          padding: 7px 10px;
-          border-radius: 5px;
-          border: transparent;
-          cursor: pointer;
-          width: 200px;
-          &:hover {
-            background-color: #e7e7e7;
-          }
+      }
+
+      .reset-btn {
+        padding: 7px 10px;
+        border-radius: 5px;
+        border: transparent;
+        cursor: pointer;
+        width: 200px;
+
+        &:hover {
+          background-color: #e7e7e7;
+        }
       }
     }
 
@@ -69,6 +76,7 @@
           box-sizing: border-box;
           padding: 10px;
           border-right: 1px solid #ccc;
+
           &:hover {
             background-color: #e0e0e0;
             cursor: pointer;
@@ -161,6 +169,118 @@
 
           &:last-child {
             margin-right: 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .main {
+    .container {
+      .main_table {
+        .main_table_title {
+          grid-template-columns: 50px 1fr 1fr 1fr 50px;
+          gap: 0;
+        }
+
+        .main_row {
+          grid-template-columns: 50px 1fr 1fr 1fr 50px;
+          gap: 0;
+          padding: 0;
+
+          .main_row_item:first-child {
+            padding: 7px 3px 7px 3px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .main {
+    .container {
+      .main_action {
+        .search-input {
+          width: 150px;
+          &::placeholder {
+            font-size: 11px;
+          }
+        }
+        .main_action_right {
+          .add-user {
+            width: unset;
+          }
+          .reset-btn {
+            width: unset;
+          }
+        }
+      }
+      .main_table {
+        .main_table_title {
+          grid-template-columns: 50px 1fr 1fr 50px;
+          gap: 0;
+
+          .main_table_title_item:nth-child(4) {
+            display: none;
+          }
+        }
+
+        .main_row {
+          grid-template-columns: 50px 1fr 1fr 50px;
+          gap: 0;
+          padding: 0;
+
+          .main_row_item:first-child {
+            padding: 7px 3px 7px 3px;
+          }
+
+          .main_row_item:nth-child(4) {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 390px) {
+  .main {
+    .container {
+      .main_title {
+        font-size: 18px;
+      }
+      .main_action {
+        .search-input {
+          width: 130px;
+        }
+        .main_action_right {
+          .add-user {
+            font-size: 12px;
+          }
+          .reset-btn {
+            font-size: 12px;
+          }
+        }
+      }
+      .main_table {
+        .main_table_title {
+          font-size: 12px;
+        }
+
+        .main_row {
+          font-size: 12px;
+
+        }
+      }
+      .pagination {
+        .pagination-pages {
+          a.pagination-page {
+            font-size: 14px;
+            width: 40px;
+            height: 40px;
           }
         }
       }
