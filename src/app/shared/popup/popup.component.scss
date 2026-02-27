@@ -1,0 +1,49 @@
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-container{
+  max-width: 400px;
+  width: 90%;
+
+  .popup {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding:10px;
+    height: 100px;
+    background-color: #c5c5c5;
+    border-radius:5px;
+    box-shadow: 0 0 10px #000;
+    position: fixed;
+    top: calc(50% - 20px);  // 20 (половина) размера самого элемента
+    left: calc(50% - 50px);
+    transform: translate(-50%, -50%);
+  }
+
+  .popup-title {
+    font-size: 1rem;
+    text-align: center;
+  }
+  .popup__action {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    .popup__btn {
+      padding: 6px 15px;
+      width: 70px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  }
+}

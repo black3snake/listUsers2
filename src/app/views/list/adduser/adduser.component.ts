@@ -104,7 +104,8 @@ export class AdduserComponent implements OnInit {
 
       // Добавляем файл, если он есть
       if (this.cropperService.croppedFileValue) {
-        formData.append('avatar', this.cropperService.croppedFileValue);
+        formData.append('avatarFile', this.cropperService.croppedFileValue);
+        formData.append('avatar', this.cropperService.croppedFileValue.name.toString());
       } else if (this.cropperService.selectedFile) {
         // Если есть выбранный файл, но еще не обрезанный
         formData.append('avatar', this.cropperService.selectedFile);

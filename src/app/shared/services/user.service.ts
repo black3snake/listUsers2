@@ -71,8 +71,5 @@ export class UserService {
     return this.http.put<Partial<UserCardType>>(environment.apiUrl + 'user/' + url, formData);
   }
 
-  // updateUser(url: string, data: Partial<UserCardType>) {
-  //   return this.http.put<Partial<UserCardType>>(environment.apiUrl + 'user/' + url, data);
-  // }
 
 }

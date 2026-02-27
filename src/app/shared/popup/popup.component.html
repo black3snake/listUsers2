@@ -1,0 +1,11 @@
+<div class="popup-overlay" *ngIf="visible" (click)="noAgree()">
+  <div class="popup-container" (click)="$event.stopPropagation()">
+    <div class="popup">
+      <h3 class="popup-title">{{ title }}</h3>
+      <div class="popup__action">
+        <button class="popup__btn" (click)="agree()">Да</button>
+        <button class="popup__btn" (click)="noAgree()">Нет</button>
+      </div>
+    </div>
+  </div>
+</div>

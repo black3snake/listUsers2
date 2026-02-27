@@ -15,8 +15,8 @@
         grid-column: 1 / 2;
         justify-self: center;
         align-self: start;
-        //height: 200px;
-        //width: 200px;
+        height: 200px;
+        width: 200px;
 
         .User_img_question {
           text-align: center;
@@ -518,6 +518,10 @@
       .User__grid {
         grid-template-columns: 1fr 1fr;
         font-size: 14px;
+        .User_img {
+          width: 170px;
+          height: 170px;
+        }
 
         .User__age_experience {
           .User__age,

@@ -10,12 +10,16 @@ import {ImageCropperComponent, ImageCroppedEvent, OutputFormat} from "ngx-image-
 import {CropperImageService} from "../../../shared/services/cropper-image.service";
 import {BehaviorSubject} from "rxjs";
 import {DefaultResponseType} from "../../../../types/default-response.type";
+import {PopupService} from "../../../shared/services/popup.service";
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['../../../../assets/styles/sharedList.scss'],
-  providers: [CropperImageService]
+  providers: [
+    CropperImageService,
+    // PopupService
+  ]
 })
 export class UserComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef;
@@ -46,6 +50,7 @@ export class UserComponent implements OnInit {
   showActiveUser$ = this.showActiveUserSubject.asObservable();
   private showActiveUser = false;
   isEditCard: boolean = false;
+  private popupService = inject(PopupService);
 
   cardForm = this.fb.group({
     firstName: [{value: '', disabled: true}, Validators.required],
@@ -61,21 +66,27 @@ export class UserComponent implements OnInit {
   get firstName() {
     return this.cardForm.get('firstName');
   }
+
   get lastName() {
     return this.cardForm.get('lastName');
   }
+
   get age() {
     return this.cardForm.get('age');
   }
+
   get address() {
     return this.cardForm.get('address');
   }
+
   get experience() {
     return this.cardForm.get('experience');
   }
+
   get email() {
     return this.cardForm.get('email');
   }
+
   get phone() {
     return this.cardForm.get('phone');
   }
@@ -83,6 +94,7 @@ export class UserComponent implements OnInit {
   get showActiveUserValue() {
     return this.showActiveUser
   }
+
   set showActiveUserValue(value: boolean) {
     this.showActiveUser = value;
     this.showActiveUserSubject.next(value);
@@ -94,13 +106,13 @@ export class UserComponent implements OnInit {
       if (params['url']) {
         // console.log(params['url']);
         this.userService.getUser(params['url'])
-          .subscribe( {
+          .subscribe({
             next: (data: UserItem) => {
               this.user = data;
               this.loadingDataForm(this.user);
               this.initialFormValues = {
                 ...this.cardForm.getRawValue(),
-                active:this.user.active
+                active: this.user.active
               };
               this.cropperService.avatarPreviewValue = this.user.avatar;
               this.showActiveUserValue = this.user.active;
@@ -158,9 +170,9 @@ export class UserComponent implements OnInit {
       delete changedValues.avatar;
     }
 
-    this.userService.updateUser(url, changedValues,  avatarFile )
-      .subscribe( {
-        next: (updatedUser: Partial<UserCardType> ) => {
+    this.userService.updateUser(url, changedValues, avatarFile)
+      .subscribe({
+        next: (updatedUser: Partial<UserCardType>) => {
           this._snackBar.open('Данные обновлены');
           // Обновляем начальные значения
           this.initialFormValues = {
@@ -198,17 +210,16 @@ export class UserComponent implements OnInit {
       const currentValue = currentValues[key];
       const initialValue = this.initialFormValues[key];
 
-    const hasChanged = currentValue !== initialValue &&
-      (JSON.stringify(currentValue) !== JSON.stringify(initialValue));
+      const hasChanged = currentValue !== initialValue &&
+        (JSON.stringify(currentValue) !== JSON.stringify(initialValue));
 
-    if (hasChanged) {
-      changedValues[key] = currentValue as any;
-    }
+      if (hasChanged) {
+        changedValues[key] = currentValue as any;
+      }
 
     });
     return changedValues;
   }
-
 
 
   actionUser() {
@@ -238,7 +249,6 @@ export class UserComponent implements OnInit {
   }
 
 
-
   // методы для работы с cropper, который работает как сервис для каждого компонента
   onFileSelected(event: Event): void {
     this.cropperService.onFileSelected(event);
@@ -249,19 +259,25 @@ export class UserComponent implements OnInit {
   }
 
   deleteAvatar(): void {
-    if (confirm('Удалить текущую фотографию?')) {
-      this.cropperService.selectedFile = null;
-      this.cropperService.avatarPreviewValue = '../../../../assets/images/avatar-stub.png';
-      this.cardForm.patchValue({ avatar: '' });
-      this.cropperService.croppedImageValue = '';
-      this.cropperService.originalImageBase64 = '';
+    this.popupService.showConfirm(
+      'Вы действительно хотите удалить фото?',
+      () => this.deleteAvatarResult()
+    );
+  }
 
-      this.cropperService.transformValue = {rotation: 0, flipH: false, flipV: false};
+  deleteAvatarResult() {
+    this.cropperService.selectedFile = null;
+    this.cropperService.avatarPreviewValue = '../../../../assets/images/avatar-stub.png';
+    this.cardForm.patchValue({avatar: ''});
+    this.cropperService.croppedImageValue = '';
+    this.cropperService.originalImageBase64 = '';
 
-      if (this.cropperService.showCropperValue) {
-        this.cropperService.closeCropper();
-      }
+    this.cropperService.transformValue = {rotation: 0, flipH: false, flipV: false};
+
+    if (this.cropperService.showCropperValue) {
+      this.cropperService.closeCropper();
     }
+
   }
 
   imageCropped(event: any): void {
@@ -299,4 +315,5 @@ export class UserComponent implements OnInit {
   backMain() {
     this.router.navigate(['/users'])
   }
+
 }
