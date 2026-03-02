@@ -11,6 +11,7 @@ export type UserItem = {
   phone: string,
   email: string,
   createdAt: Date | string, // или просто Date, если контролируете
+  reserved: boolean,
 };
 
 export type PaginationType = {

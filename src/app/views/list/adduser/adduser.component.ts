@@ -9,6 +9,7 @@ import {DefaultResponseType} from "../../../../types/default-response.type";
 import {ImageCropperComponent, ImageCroppedEvent, OutputFormat} from "ngx-image-cropper";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {CropperImageService} from "../../../shared/services/cropper-image.service";
+import {PopupService} from "../../../shared/services/popup.service";
 
 @Component({
   selector: 'app-adduser',
@@ -16,7 +17,7 @@ import {CropperImageService} from "../../../shared/services/cropper-image.servic
   styleUrls: ['../../../../assets/styles/sharedList.scss'],
   providers: [CropperImageService]
 })
-export class AdduserComponent implements OnInit {
+export class AdduserComponent {
   @ViewChild('fileInput') fileInput!: ElementRef;
   @ViewChild(ImageCropperComponent) imageCropper: any;
 
@@ -27,6 +28,7 @@ export class AdduserComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   public cropperService = inject(CropperImageService);
   private patternEmailString: RegExp = /^(?!.*\.\.)([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2})$/;
+  private popupService = inject(PopupService);
 
   user: UserItem = {
     id: "",
@@ -40,7 +42,8 @@ export class AdduserComponent implements OnInit {
     email: "",
     active: true,
     createdAt: "",
-    url: ""
+    url: "",
+    reserved: false,
   };
 
   cardNewForm  = this.fb.group({
@@ -81,11 +84,6 @@ export class AdduserComponent implements OnInit {
       const result = pattern.test(control.value);
       return result ? null : {pattern: {value: control.value}};
     }
-  }
-
-
-
-  ngOnInit(): void {
   }
 
   saveCard() {
@@ -148,8 +146,14 @@ export class AdduserComponent implements OnInit {
     this.fileInput.nativeElement.click();
   }
 
-  deleteAvatar(): void {
-    if (confirm('Удалить текущую фотографию?')) {
+  deleteAvatar() {
+    this.popupService.showConfirm(
+      'Удалить текущую фотографию?',  // Заголовок
+      () => this.deleteAvatarResult()           // Действие при согласии
+    );
+  }
+
+  deleteAvatarResult(): void {
       this.cropperService.selectedFile = null;
       this.cropperService.avatarPreviewValue = '../../../../assets/images/avatar-stub.png';
       this.cardNewForm.patchValue({ avatar: '' });
@@ -161,7 +165,6 @@ export class AdduserComponent implements OnInit {
       if (this.cropperService.showCropperValue) {
         this.cropperService.closeCropper();
       }
-    }
   }
 
   imageCropped(event: any): void {
@@ -190,10 +193,9 @@ export class AdduserComponent implements OnInit {
   }
 
   resetForm(): void {
-    if (confirm('Сбросить все изменения?')) {
       this.cardNewForm.reset();
-      this.deleteAvatar();
-    }
+      this.deleteAvatarResult();
+
   }
 
 }

@@ -9,4 +9,5 @@ export type UserCardType = {
   avatar?: string | null,
   avatarFile?: string | null,
   active: boolean | null,
+  reserved?: boolean | null,
 }

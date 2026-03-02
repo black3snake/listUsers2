@@ -16,10 +16,7 @@ import {PopupService} from "../../../shared/services/popup.service";
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['../../../../assets/styles/sharedList.scss'],
-  providers: [
-    CropperImageService,
-    // PopupService
-  ]
+  providers: [CropperImageService]
 })
 export class UserComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef;
@@ -37,7 +34,8 @@ export class UserComponent implements OnInit {
     email: "",
     active: true,
     createdAt: "",
-    url: ""
+    url: "",
+    reserved: false,
   };
   private activatedRoute = inject(ActivatedRoute);
   private userService = inject(UserService);
@@ -228,7 +226,13 @@ export class UserComponent implements OnInit {
   }
 
   deleteCard(id: string) {
-    if (confirm('Удалить текущего пользователя?')) {
+    this.popupService.showConfirm(
+      'Удалить текущего пользователя?',
+      () => this.deleteCardResult(id)
+    );
+  }
+
+  deleteCardResult(id: string) {
       this.userService.deleteUser(id).subscribe({
         next: (response: DefaultResponseType) => {
           if (!response.error) {
@@ -239,13 +243,15 @@ export class UserComponent implements OnInit {
             this._snackBar.open(response.message);
           }
         },
-        error: (err) => {
-          console.error('Delete error:', err);
-          this._snackBar.open('Ошибка при удалении');
+        error: (err: HttpErrorResponse) => {
+          if (err.error && err.error.message) {
+            this._snackBar.open(err.error.message);
+            console.log(err.error.message);
+          } else {
+            this._snackBar.open('Не могу получить доступ к серверу');
+          }
         }
       });
-
-    }
   }
 
 
