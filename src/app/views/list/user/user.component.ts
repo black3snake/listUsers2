@@ -1,4 +1,4 @@
-import {Component, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {HttpErrorResponse} from "@angular/common/http";
 import {MatSnackBar} from "@angular/material/snack-bar";
@@ -11,6 +11,8 @@ import {CropperImageService} from "../../../shared/services/cropper-image.servic
 import {BehaviorSubject} from "rxjs";
 import {DefaultResponseType} from "../../../../types/default-response.type";
 import {PopupService} from "../../../shared/services/popup.service";
+import {environment} from "../../../../environments/environment";
+
 
 @Component({
   selector: 'app-user',
@@ -18,7 +20,7 @@ import {PopupService} from "../../../shared/services/popup.service";
   styleUrls: ['../../../../assets/styles/sharedList.scss'],
   providers: [CropperImageService]
 })
-export class UserComponent implements OnInit {
+export class UserComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput!: ElementRef;
   @ViewChild(ImageCropperComponent) imageCropper: any;
 
@@ -49,6 +51,7 @@ export class UserComponent implements OnInit {
   private showActiveUser = false;
   isEditCard: boolean = false;
   private popupService = inject(PopupService);
+  serverStaticPath = environment.serverStaticPath;
 
   cardForm = this.fb.group({
     firstName: [{value: '', disabled: true}, Validators.required],
@@ -112,7 +115,9 @@ export class UserComponent implements OnInit {
                 ...this.cardForm.getRawValue(),
                 active: this.user.active
               };
-              this.cropperService.avatarPreviewValue = this.user.avatar;
+              if (!this.user.avatar.includes('avatar-stub.png')) {
+                this.cropperService.avatarPreviewValue =  this.serverStaticPath + this.user.avatar;
+              }
               this.showActiveUserValue = this.user.active;
             },
             error: (err: HttpErrorResponse) => {
@@ -123,7 +128,6 @@ export class UserComponent implements OnInit {
               }
             }
           })
-
       }
     });
   }
@@ -179,7 +183,7 @@ export class UserComponent implements OnInit {
           };
           if (updatedUser.avatar) {
             this.user.avatar = updatedUser.avatar;
-            this.cropperService.avatarPreviewValue = updatedUser.avatar;
+            this.cropperService.avatarPreviewValue = this.serverStaticPath + updatedUser.avatar;
           }
 
           // Сбрасываем состояние кроппера
@@ -272,13 +276,17 @@ export class UserComponent implements OnInit {
   }
 
   deleteAvatarResult() {
+    this.cropperService.cleanupBlobUrls();
     this.cropperService.selectedFile = null;
-    this.cropperService.avatarPreviewValue = '../../../../assets/images/avatar-stub.png';
+    // this.cropperService.avatarPreviewValue = '../../../../assets/images/avatar-stub.png';
+    this.cropperService.avatarPreviewValue = '/assets/images/avatar-stub.png';
     this.cardForm.patchValue({avatar: ''});
     this.cropperService.croppedImageValue = '';
     this.cropperService.originalImageBase64 = '';
 
     this.cropperService.transformValue = {rotation: 0, flipH: false, flipV: false};
+    // Очищаем user.avatar
+    this.user.avatar = '';
 
     if (this.cropperService.showCropperValue) {
       this.cropperService.closeCropper();
@@ -320,6 +328,11 @@ export class UserComponent implements OnInit {
 
   backMain() {
     this.router.navigate(['/users'])
+  }
+
+  ngOnDestroy(): void {
+    // Очищаем blob URL при уничтожении компонента
+    this.cropperService.cleanupBlobUrls();
   }
 
 }

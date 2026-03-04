@@ -2,7 +2,10 @@
   <div class="container">
     <div class="User__grid" [formGroup]="cardForm">
       <div class="User_img">
-        <img [src]="(cropperService.avatarPreview$ | async) || user.avatar" alt="User image" class="User_img_image">
+        <img [src]="(cropperService.avatarPreview$ | async) || (user.avatar ? (serverStaticPath + user.avatar) : '../../../../assets/images/avatar-stub.png')"
+             alt="User image" class="User_img_image">
+<!--        || (serverStaticPath + user.avatar) || '../../../../assets/images/avatar-stub.png'" || (cropperService.avatarPreview$ | async)-->
+
         <div class="User__active" *ngIf="!isEditCard" [ngStyle]="{'background': (showActiveUser$ | async) ? 'green': '', 'color': (showActiveUser$ | async) ? 'white': '' }">
           Status: {{ (showActiveUser$ | async) || user.active ? 'Active' : 'Not active' }}
         </div>

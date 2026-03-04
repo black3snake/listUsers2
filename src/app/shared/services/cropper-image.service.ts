@@ -162,12 +162,24 @@ export class CropperImageService {
       this.croppedFileValue = this.blobToFile(event.blob, fileName);
     }
 
-    if (event.objectUrl) {
-      this.croppedImageValue = event.objectUrl;
-      this.avatarPreviewValue = this.sanitizer.bypassSecurityTrustUrl(event.objectUrl);
+    if(event.blob) {
+      // Освобождаем старый blob URL, если он был
+      const currentPreview = this.avatarPreview;
+      if (typeof currentPreview === 'string' && currentPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(currentPreview);
+      }
+      // Создаем новый blob URL
+      this.avatarPreviewValue = URL.createObjectURL(event.blob);
     } else if (event.base64) {
       this.avatarPreviewValue = event.base64;
     }
+
+    // if (event.objectUrl) {
+    //   this.croppedImageValue = event.objectUrl;
+    //   this.avatarPreviewValue = this.sanitizer.bypassSecurityTrustUrl(event.objectUrl);
+    // } else if (event.base64) {
+    //   this.avatarPreviewValue = event.base64;
+    // }
   }
 
   getFormatFromMimeType(mimeType: string): string {
@@ -258,7 +270,6 @@ export class CropperImageService {
       let width = img.width;
       let height = img.height;
 
-      // if (this.currentRotation % 180 !== 0) {
       if (this.transformValue.rotation % 180 !== 0) {
         [width, height] = [height, width];
       }
@@ -286,15 +297,40 @@ export class CropperImageService {
       // Получаем трансформированное изображение
       const transformedImage = canvas.toDataURL('image/png', this.imageQuality / 100);
 
+      // Освобождаем старый blob URL
+      const currentPreview = this.avatarPreview;
+      if (typeof currentPreview === 'string' && currentPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(currentPreview);
+      }
+
+      // Создаем новый blob URL из canvas
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const blobUrl = URL.createObjectURL(blob);
+          this.avatarPreview = blobUrl;
+          this.avatarPreviewSubject.next(blobUrl);
+
+          // Обновляем croppedImage
+          this.croppedImage = transformedImage;
+          this.croppedImageSubject.next(transformedImage);
+
+          // Создаем новый файл из трансформированного изображения
+          const fileName = this.selectedFile?.name || `avatar_${Date.now()}_transformed.png`;
+          this.croppedFile = this.blobToFile(blob, fileName);
+          this.croppedFileSubject.next(this.croppedFile);
+        }
+      }, 'image/png', this.imageQuality / 100);
+
+
       // Обновляем preview
-      this.avatarPreview = transformedImage;
-
-      // Обновляем croppedImage
-      this.croppedImage = transformedImage;
-
-      // Создаем новый файл из трансформированного изображения
-      const fileName = this.selectedFile?.name || `avatar_${Date.now()}_transformed.png`;
-      this.croppedFile = this.base64ToFile(transformedImage, fileName);
+      // this.avatarPreview = transformedImage;
+      //
+      // // Обновляем croppedImage
+      // this.croppedImage = transformedImage;
+      //
+      // // Создаем новый файл из трансформированного изображения
+      // const fileName = this.selectedFile?.name || `avatar_${Date.now()}_transformed.png`;
+      // this.croppedFile = this.base64ToFile(transformedImage, fileName);
     };
   }
 
@@ -329,5 +365,12 @@ export class CropperImageService {
   }
 
 
+  cleanupBlobUrls(): void {
+    const currentPreview = this.avatarPreview;
+    if (typeof currentPreview === 'string' && currentPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(currentPreview);
+    }
+    this.avatarPreviewValue = 'avatar-stub.png';
+  }
 
 }
