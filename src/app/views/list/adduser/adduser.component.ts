@@ -27,7 +27,7 @@ export class AdduserComponent {
   private sanitizer = inject(DomSanitizer);
   private cdr = inject(ChangeDetectorRef);
   public cropperService = inject(CropperImageService);
-  private patternEmailString: RegExp = /^(?!.*\.\.)([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2})$/;
+  private patternEmailString: RegExp = /^(?!.*\.\.)([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3})$/;
   private popupService = inject(PopupService);
 
   user: UserItem = {
