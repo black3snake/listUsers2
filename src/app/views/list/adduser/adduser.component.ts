@@ -34,7 +34,7 @@ export class AdduserComponent {
     id: "",
     firstName: "",
     lastName: "",
-    avatar: "../../../../assets/images/avatar-stub.png",
+    avatar: "/assets/images/avatar-stub.png",
     experience: 0,
     age: 0,
     address: "",
@@ -46,35 +46,44 @@ export class AdduserComponent {
     reserved: false,
   };
 
-  cardNewForm  = this.fb.group({
+  cardNewForm = this.fb.group({
     firstName: [{value: '', disabled: false}, Validators.required],
     lastName: [{value: '', disabled: false}, Validators.required],
-    age: [{value: '', disabled: false}, [Validators.required,Validators.max(100), Validators.pattern('[0-9]+')]],
+    age: [{value: '', disabled: false}, [Validators.required, Validators.max(100), Validators.pattern('[0-9]+')]],
     address: [{value: '', disabled: false}, [Validators.required, Validators.pattern('^[а-яА-Я0-9,\\/\\-\\.\\s]+$')]],
-    experience: [{value: '', disabled: false}, [Validators.required, Validators.max(50),Validators.pattern('[0-9]+')]],
+    experience: [{value: '', disabled: false}, [Validators.required, Validators.max(50), Validators.pattern('[0-9]+')]],
     email: [{value: '', disabled: false}, [Validators.required, this.emailValidator(this.patternEmailString)]],
-    phone: [{value: '', disabled: false}, [Validators.required, Validators.pattern('[0-9]+'), Validators.maxLength(11)]],
+    phone: [{
+      value: '',
+      disabled: false
+    }, [Validators.required, Validators.pattern('[0-9]+'), Validators.maxLength(11)]],
     avatar: ['']
   });
 
   get firstName() {
     return this.cardNewForm.get('firstName');
   }
+
   get lastName() {
     return this.cardNewForm.get('lastName');
   }
+
   get age() {
     return this.cardNewForm.get('age');
   }
+
   get address() {
     return this.cardNewForm.get('address');
   }
+
   get experience() {
     return this.cardNewForm.get('experience');
   }
+
   get email() {
     return this.cardNewForm.get('email');
   }
+
   get phone() {
     return this.cardNewForm.get('phone');
   }
@@ -87,8 +96,8 @@ export class AdduserComponent {
   }
 
   saveCard() {
-    if(this.cardNewForm.valid && this.cardNewForm.value.firstName && this.cardNewForm.value.lastName && this.cardNewForm.value.age &&
-      this.cardNewForm.value.address && this.cardNewForm.value.experience && this.cardNewForm.value.email && this.cardNewForm.value.phone ) {
+    if (this.cardNewForm.valid && this.cardNewForm.value.firstName && this.cardNewForm.value.lastName && this.cardNewForm.value.age &&
+      this.cardNewForm.value.address && this.cardNewForm.value.experience && this.cardNewForm.value.email && this.cardNewForm.value.phone) {
 
       const formData = new FormData();
       // Добавляем текстовые поля
@@ -113,7 +122,7 @@ export class AdduserComponent {
       }
 
       this.userService.createUserFlexible(formData)
-        .subscribe( {
+        .subscribe({
           next: (data: UserCardType | DefaultResponseType) => {
             if ((data as DefaultResponseType).error !== undefined) {
               throw new Error((data as DefaultResponseType).message);
@@ -154,17 +163,21 @@ export class AdduserComponent {
   }
 
   deleteAvatarResult(): void {
-      this.cropperService.selectedFile = null;
-      this.cropperService.avatarPreviewValue = '../../../../assets/images/avatar-stub.png';
-      this.cardNewForm.patchValue({ avatar: '' });
-      this.cropperService.croppedImageValue = '';
-      this.cropperService.originalImageBase64 = '';
+    this.cropperService.cleanupBlobUrls();
+    this.cropperService.selectedFile = null;
+    // this.cropperService.avatarPreviewValue = '../../../../assets/images/avatar-stub.png';
+    this.cropperService.avatarPreviewValue = '/assets/images/avatar-stub.png';
+    this.cardNewForm.patchValue({avatar: ''});
+    this.cropperService.croppedImageValue = '';
+    this.cropperService.originalImageBase64 = '';
 
-      this.cropperService.transformValue = {rotation: 0, flipH: false, flipV: false};
+    this.cropperService.transformValue = {rotation: 0, flipH: false, flipV: false};
+    // Очищаем user.avatar
+    this.user.avatar = '';
 
-      if (this.cropperService.showCropperValue) {
-        this.cropperService.closeCropper();
-      }
+    if (this.cropperService.showCropperValue) {
+      this.cropperService.closeCropper();
+    }
   }
 
   imageCropped(event: any): void {
@@ -193,9 +206,9 @@ export class AdduserComponent {
   }
 
   resetForm(): void {
-      this.cardNewForm.reset();
-      this.deleteAvatarResult();
-
+    this.cardNewForm.reset();
+    this.deleteAvatarResult();
+    this.cropperService.cleanupBlobUrls();
   }
 
 }
